@@ -1,0 +1,38 @@
+{
+  "app": {
+    "title": "Bibliothèque de jeux",
+    "confirmDeletionTitle": "Confirmer la suppression",
+    "confirmDeletionMessage": "Êtes-vous sûr de vouloir supprimer ce jeu ?"
+  },
+  "gameList": {
+    "name": "Nom",
+    "platform": "Plateforme",
+    "year": "Année de sortie",
+    "genre": "Genre",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "gameForm": {
+    "addGame": "Ajouter un jeu",
+    "editGame": "Modifier le jeu",
+    "name": "Nom du jeu",
+    "platform": "Plateforme",
+    "year": "Année de sortie",
+    "genre": "Genre",
+    "errorName": "Veuillez entrer un nom",
+    "errorPlatform": "Veuillez sélectionner une plateforme",
+    "errorYear": "Veuillez entrer une année de sortie",
+    "errorGenre": "Veuillez sélectionner un genre",
+    "success": "Le jeu a été ajouté avec succès"
+  },
+  "button": {
+    "add": "Ajouter un jeu",
+    "edit": "Modifier le jeu",
+    "update": "Mettre à jour",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser"
+  }
+}
