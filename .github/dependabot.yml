@@ -6,21 +6,14 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "16:00"
-      timezone: "America/Toronto"
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "16:00"
-      timezone: "America/Toronto"
-  - package-ecosystem: "npm"
-    directory: "/backend"
+    directories:
+      - "/"
+      - "/frontend"
+      - "/backend"
+    commit-message:
+      # Prefix all commit messages with "npm: "
+      prefix: "chore"
+      include: "scope"
     schedule:
       interval: "weekly"
       day: "friday"
