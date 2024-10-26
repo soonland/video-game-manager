@@ -14,7 +14,7 @@ describe("Home Page", () => {
       .should("be.visible")
       .should("be.enabled");
 
-    cy.get("[data-testid='app.listControl.btn.export']")
+    cy.get("[data-testid='app.listControl.btn.checkAll']")
       .should("be.visible")
       .should("be.enabled");
 
@@ -93,7 +93,7 @@ describe("Home Page", () => {
     cy.wait("@postGame");
   });
 
-  it.only("should delete a game", () => {
+  it("should delete a game", () => {
     cy.visit("/");
     cy.intercept("GET", "/api/games", {
       body: {
@@ -141,7 +141,7 @@ describe("Home Page", () => {
     cy.wait("@getGames");
 
     cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
-    cy.get("[data-testid='gameList.item.checkbox.1']").click();
+    cy.get("[data-testid='app.gameList.item.checkbox.1']").click();
     cy.get("[data-testid='app.listControl.btn.delete']").click();
     cy.get("[data-testid='app.confirmationDialog.btnConfirm']").click();
 
@@ -149,5 +149,61 @@ describe("Home Page", () => {
       expect(interception.request.url).to.match(/\/api\/games\/1$/);
     });
     cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
+  });
+
+  it("should check all games", () => {
+    cy.visit("/");
+    cy.intercept("GET", "/api/games", {
+      body: {
+        games: [
+          {
+            id: "1",
+            name: "Mass Effect",
+            year: 2007,
+            platform: "Xbox 360",
+            genre: "Action",
+          },
+          {
+            id: "2",
+            name: "Mass Effect 2",
+            year: 2010,
+            platform: "Xbox 360",
+            genre: "Action",
+          },
+          {
+            id: "3",
+            name: "Mass Effect 3",
+            year: 2012,
+            platform: "Xbox 360",
+            genre: "Action",
+          },
+          {
+            id: "4",
+            name: "Mass Effect Legendary Edition",
+            year: 2021,
+            platform: "Xbox Series X|S",
+            genre: "Action",
+          },
+          {
+            id: "5",
+            name: "Mass Effect Andromeda",
+            year: 2017,
+            platform: "Xbox One",
+            genre: "Action",
+          },
+        ],
+      },
+    }).as("getGames");
+
+    cy.wait("@getGames");
+
+    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
+    cy.get("[data-testid='app.listControl.btn.delete']").contains("(0)");
+    cy.get("[data-testid='app.listControl.btn.checkAll']").click();
+    cy.get("[data-testid='app.listControl.btn.delete']").should("be.enabled");
+    cy.get("[data-testid='app.listControl.btn.delete']").contains("(5)");
+    cy.get("[data-testid='app.listControl.btn.checkAll']").click();
+    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
+    cy.get("[data-testid='app.listControl.btn.delete']").contains("(0)");
   });
 });

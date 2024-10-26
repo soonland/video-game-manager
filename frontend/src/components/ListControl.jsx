@@ -1,8 +1,16 @@
-import { Delete, Download } from "@mui/icons-material";
+import { CheckBox, Delete, CheckBoxOutlineBlank } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
 import PropTypes from "prop-types";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const ListControl = ({ count, onDelete }) => {
+const ListControl = ({ count, onDelete, onCheckAll }) => {
+  const [checkedAll, setCheckedAll] = useState(false);
+  const handleCheckAll = () => {
+    setCheckedAll(!checkedAll);
+    onCheckAll(checkedAll);
+  };
+  const { t } = useTranslation();
   return (
     <Stack
       direction={"row"}
@@ -13,10 +21,11 @@ const ListControl = ({ count, onDelete }) => {
       <Button
         variant="contained"
         color="primary"
-        endIcon={<Download />}
-        data-testid="app.listControl.btn.export"
+        startIcon={checkedAll ? <CheckBox /> : <CheckBoxOutlineBlank />}
+        onClick={handleCheckAll}
+        data-testid="app.listControl.btn.checkAll"
       >
-        Exporter
+        {checkedAll ? t("button.uncheckAll") : t("button.checkAll")}
       </Button>
       <Button
         variant="contained"
@@ -26,7 +35,7 @@ const ListControl = ({ count, onDelete }) => {
         onClick={onDelete}
         data-testid="app.listControl.btn.delete"
       >
-        {count === 0 ? "Supprimer" : `Supprimer (${count})`}
+        {t("button.delete", { count })}
       </Button>
     </Stack>
   );
@@ -36,6 +45,7 @@ const ListControl = ({ count, onDelete }) => {
 ListControl.propTypes = {
   count: PropTypes.number.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onCheckAll: PropTypes.func.isRequired,
 };
 
 export default ListControl;
