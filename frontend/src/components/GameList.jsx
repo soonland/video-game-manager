@@ -1,12 +1,14 @@
 import { Box, List, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import ConfirmationDialog from "./ConfirmationDialog";
 import GameItem from "./GameItem";
 import ListControl from "./ListControl";
 
 const GameList = ({ games, onDeleteGame, onEditGame }) => {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [checked, setChecked] = useState([]);
 
@@ -23,6 +25,14 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
       removeFromList(gameId);
     } else {
       addToList(gameId);
+    }
+  };
+
+  const handleCheckAll = () => {
+    if (checked.length === games.length) {
+      setChecked([]);
+    } else {
+      setChecked(games.map((game) => game.id));
     }
   };
 
@@ -56,10 +66,11 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
         <ListControl
           count={checked.length}
           onDelete={() => handleConfirm(checked)}
+          onCheckAll={handleCheckAll}
         />
         {games.length === 0 ? (
           <Typography variant="h6" align="center" color="text.secondary">
-            Aucune entrée de jeu disponible.
+            {t("gameList.noGames")}
           </Typography>
         ) : (
           <List>

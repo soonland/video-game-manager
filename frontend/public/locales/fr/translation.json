@@ -11,7 +11,8 @@
     "genre": "Genre",
     "actions": "Actions",
     "edit": "Modifier",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "noGames": "Aucun jeu trouvé"
   },
   "gameForm": {
     "addGame": "Ajouter un jeu",
@@ -30,9 +31,11 @@
     "add": "Ajouter un jeu",
     "edit": "Modifier le jeu",
     "update": "Mettre à jour",
-    "delete": "Supprimer",
+    "delete": "Supprimer ({{count}})",
     "save": "Enregistrer",
     "cancel": "Annuler",
-    "reset": "Réinitialiser"
+    "reset": "Réinitialiser",
+    "checkAll": "Tout cocher",
+    "uncheckAll": "Tout décocher"
   }
 }

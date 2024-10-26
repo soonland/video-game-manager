@@ -61,7 +61,7 @@ const GameItem = ({ game, onDelete, onEdit, onCheck, isChecked }) => {
         checked={isChecked}
         tabIndex={-1}
         onClick={() => onCheck(game.id)}
-        data-testid={`gameList.item.checkbox.${game.id}`}
+        data-testid={`app.gameList.item.checkbox.${game.id}`}
         inputProps={{
           "aria-labelledby": labelId,
         }}
