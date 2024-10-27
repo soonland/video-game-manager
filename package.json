@@ -2,9 +2,8 @@
   "name": "video-game-manager",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"npm --prefix backend run start\" \"npm --prefix frontend run dev\"",
-    "start:preview": "concurrently \"npm --prefix backend run start\" \"npm --prefix frontend run preview\"",
-    "postinstall": "npm ci --prefix backend && npm ci --prefix frontend"
+    "start": "concurrently \"npm run start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install-all": "npm ci --prefix backend && npm ci --prefix frontend"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"
