@@ -13,20 +13,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: node server.js &
 
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm install
-
-      - name: Start backend service
-        working-directory: ./backend
-        run: node server.js &  # Lance le backend en arrière-plan
-
-      - name: Wait for Backend
-        run: npx wait-on http://localhost:5000/
 
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
