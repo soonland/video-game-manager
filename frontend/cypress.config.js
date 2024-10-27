@@ -1,10 +1,15 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  projectId: "hk8yzm",
   e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
-    },
-    baseUrl: "http://localhost:5173",
+    baseUrl: "http://localhost:4173",
+    specPattern: "**/*.cy.js",
+    screenshotsFolder: "cypress/screenshots",
+    screenshotOnRunFailure: true,
+    videosFolder: "cypress/videos",
+    video: true,
+    trashAssetsBeforeRuns: true,
+    experimentalRunAllSpecs: true,
   },
 });
