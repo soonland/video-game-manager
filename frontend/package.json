@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview --host",
+    "preview": "vite preview",
     "test": "jest --passWithNoTests",
     "cy:open": "cypress open -C cypress/config/cypress.config.local.js"
   },
