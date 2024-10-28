@@ -47,7 +47,7 @@ describe("Home Page", () => {
     cy.wait("@postGame");
     cy.get("[data-testid='app.gameForm.alert.success']").should("exist");
     cy.get("[data-testid='app.gameForm.alert.success']").should(
-      "not.be.visible",
+     "be.visible",
     );
 
     cy.get("[data-testid='app.gameForm.name']").type("Mass Effect 2");
