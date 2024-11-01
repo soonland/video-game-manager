@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "MS-CEINTL.vscode-language-pack-fr",
+      "esbenp.prettier-vscode",
+      "soonland.vscode-optidev-themes"
+    ]
+  }
