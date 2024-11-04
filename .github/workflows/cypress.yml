@@ -27,7 +27,7 @@ jobs:
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
           start: npm run preview --workspace=video-game-manager-frontend
           wait-on: 'http://localhost:4173' # Waits for above
-          command: npm run cy:run
+          command: npm run cy:run --workspace=video-game-manager-frontend
           # Records to Cypress Cloud 
           # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
           record: true
