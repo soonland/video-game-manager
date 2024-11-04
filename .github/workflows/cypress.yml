@@ -16,6 +16,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install backend dependencies
+        run: npm install
+  
+      - name: Starting backend
         run: node packages/backend/server.js &
 
       - name: Cypress run
