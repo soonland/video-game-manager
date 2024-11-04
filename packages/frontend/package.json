@@ -10,7 +10,8 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "test": "jest --passWithNoTests",
-    "cy:open": "cypress open -C cypress/config/cypress.config.local.js"
+    "cy:open": "cypress open -C cypress/config/cypress.config.local.js",
+    "cy:run": "cypress run -C cypress/config/cypress.config.local.js"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
