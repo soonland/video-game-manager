@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test": "jest --passWithNoTests",
     "cy:open": "cypress open -C cypress/config/cypress.config.local.js",
-    "cy:run": "cypress run -C cypress/config/cypress.config.e2e.js"
+    "cy:run": "cypress run -C cypress/config/cypress.config.e2e.js --record"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
