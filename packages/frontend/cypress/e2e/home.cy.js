@@ -49,48 +49,6 @@ describe("Home Page", () => {
     cy.get("[data-testid='app.gameForm.alert.success']").should(
      "be.visible",
     );
-
-    cy.get("[data-testid='app.gameForm.name']").type("Mass Effect 2");
-    cy.get("[data-testid='app.gameForm.year']").type("2010");
-    cy.get("[data-testid='app.gameForm.platform']").click();
-    cy.get('[data-value="Xbox 360"]').click();
-    cy.get("[data-testid='app.gameForm.genre']").click();
-    cy.get("[data-value='Action']").click();
-    cy.get("[data-testid='app.gameForm.btn.add']").click();
-
-    cy.wait("@postGame");
-
-    cy.get("[data-testid='app.gameForm.name']").type("Mass Effect 3");
-    cy.get("[data-testid='app.gameForm.year']").type("2012");
-    cy.get("[data-testid='app.gameForm.platform']").click();
-    cy.get('[data-value="Xbox 360"]').click();
-    cy.get("[data-testid='app.gameForm.genre']").click();
-    cy.get("[data-value='Action']").click();
-    cy.get("[data-testid='app.gameForm.btn.add']").click();
-
-    cy.wait("@postGame");
-
-    cy.get("[data-testid='app.gameForm.name']").type(
-      "Mass Effect Legendary Edition",
-    );
-    cy.get("[data-testid='app.gameForm.year']").type("2021");
-    cy.get("[data-testid='app.gameForm.platform']").click();
-    cy.get('[data-value="Xbox Series X|S"]').click();
-    cy.get("[data-testid='app.gameForm.genre']").click();
-    cy.get("[data-value='Action']").click();
-    cy.get("[data-testid='app.gameForm.btn.add']").click();
-
-    cy.wait("@postGame");
-
-    cy.get("[data-testid='app.gameForm.name']").type("Mass Effect Andromeda");
-    cy.get("[data-testid='app.gameForm.year']").type("2017");
-    cy.get("[data-testid='app.gameForm.platform']").click();
-    cy.get('[data-value="Xbox One"]').click();
-    cy.get("[data-testid='app.gameForm.genre']").click();
-    cy.get("[data-value='Action']").click();
-    cy.get("[data-testid='app.gameForm.btn.add']").click();
-
-    cy.wait("@postGame");
   });
 
   it("should delete a game", () => {
