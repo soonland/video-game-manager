@@ -49,8 +49,6 @@ describe("Home Page", () => {
     cy.get("[data-testid='app.gameForm.alert.success']").should(
      "be.visible",
     );
-
-    cy.wait("@postGame");
   });
 
   it("should delete a game", () => {
