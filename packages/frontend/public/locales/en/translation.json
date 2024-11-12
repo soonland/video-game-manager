@@ -25,6 +25,8 @@
     "errorPlatform": "Please select a platform",
     "errorYear": "Please enter a release year",
     "errorGenre": "Please select a genre",
+    "errorAdd": "An error occurred while adding the game",
+    "errorEdit": "An error occurred while editing the game",
     "success": "The game has been successfully added"
   },
   "button": {

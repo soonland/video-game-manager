@@ -91,18 +91,40 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
           year: Number(year),
           platform,
           genre,
-        });
+        })
+          .then(() => {
+            setName("");
+            setYear("");
+            setPlatform("");
+            setGenre("");
+            setIsEditing(false);
+            setHasError(false);
+            setIsSuccess(true);
+            setErrors([]);
+          })
+          .catch(() => {
+            setHasError(true);
+            setIsSuccess(false);
+            setErrors(["gameForm.errorEdit"]);
+          });
       } else {
-        await onAdd({ name, year: Number(year), platform, genre });
+        await onAdd({ name, year: Number(year), platform, genre })
+          .then(() => {
+            setName("");
+            setYear("");
+            setPlatform("");
+            setGenre("");
+            setIsEditing(false);
+            setHasError(false);
+            setIsSuccess(true);
+            setErrors([]);
+          })
+          .catch(() => {
+            setHasError(true);
+            setIsSuccess(false);
+            setErrors(["gameForm.errorAdd"]);
+          });
       }
-      setName("");
-      setYear("");
-      setPlatform("");
-      setGenre("");
-      setIsEditing(false);
-      setHasError(false);
-      setIsSuccess(true);
-      setErrors([]);
     } else {
       setHasError(true);
       setIsSuccess(false);

@@ -22,7 +22,12 @@ const App = () => {
 
   const loadGames = async () => {
     fetch("/api/games")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch games");
+        }
+        return response.json();
+      })
       .then((data) => {
         setGames(data.games); // Supposons que setGames est utilisé pour stocker la liste des jeux
       })
@@ -37,19 +42,21 @@ const App = () => {
 
   const addGame = async (gameData) => {
     await new Promise((r) => setTimeout(r, 2000));
-    fetch("/api/games", {
+    await fetch("/api/games", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(gameData),
     })
-      .then((response) => response.json())
-      .then(() => {
-        loadGames();
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add game");
+        }
+        return response.json();
       })
-      .catch((error) => {
-        console.error("Error:", error);
+      .then(async () => {
+        await loadGames();
       });
   };
 
@@ -62,13 +69,19 @@ const App = () => {
       },
       body: JSON.stringify(gameData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add game");
+        }
+        return response.json();
+      })
+
       .then((data) => {
         console.log("Game updated:", data);
         loadGames();
       })
       .catch((error) => {
-        console.error("Error:", error);
+        throw error;
       });
   };
 
