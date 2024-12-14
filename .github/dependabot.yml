@@ -17,6 +17,9 @@ updates:
       day: "friday"
       time: "16:00"
       timezone: "America/Toronto"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
