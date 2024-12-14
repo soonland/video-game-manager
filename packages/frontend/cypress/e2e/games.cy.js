@@ -3,10 +3,15 @@ describe("Games panel", () => {
     cy.visit("/");
     cy.intercept("GET", "/api/games").as("getGames");
     cy.intercept("POST", "/api/games").as("postGame");
-    cy.intercept("GET", "/api/platforms").as("getPlatforms");
+    cy.intercept("GET", "/api/platforms", {
+      platforms: [
+        { id: 1, name: "Xbox 360", year: 2005 },
+        { id: 2, name: "Xbox One", year: 2013 },
+        { id: 3, name: "Xbox Series X|S", year: 2020 },
+      ],
+    }).as("getPlatforms");
 
     cy.wait("@getGames");
-    cy.wait("@getPlatforms");
 
     cy.get("[data-testid='app.gameForm.name']").type("Mass Effect");
     cy.get("[data-testid='app.gameForm.year']").type("2007");
