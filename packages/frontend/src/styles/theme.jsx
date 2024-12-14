@@ -74,8 +74,7 @@ const theme = createTheme({
     MuiDialog: {
       styleOverrides: {
         root: {
-          backdropFilter: "blur(4px)",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
         },
         paper: {
           backgroundColor: paperColor,

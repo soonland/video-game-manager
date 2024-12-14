@@ -2,7 +2,7 @@
   "name": "video-game-manager",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"npm run start --workspace=video-game-manager-backend\" \"npm run dev --workspace=video-game-manager-frontend\""
+    "start": "concurrently \"npm run start --workspace=backend\" \"npm run dev --workspace=frontend\""
   },
   "workspaces": [
     "packages/*"

@@ -8,7 +8,6 @@ import {
   InputLabel,
   List,
   ListItem,
-  ListSubheader,
   MenuItem,
   Select,
   Stack,
@@ -34,6 +33,7 @@ const CustomAlert = styled(Alert)({
 
 const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
   const { t } = useTranslation();
+  const [platforms, setPlatforms] = useState([]);
   const [name, setName] = useState(existingGame ? existingGame.name : "");
   const [year, setYear] = useState(existingGame ? existingGame.year : "");
   const [platform, setPlatform] = useState(
@@ -52,6 +52,22 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
   const platformId = "game-platform";
   const genreId = "game-genre";
 
+  const loadPlatforms = async () => {
+    fetch("/api/platforms")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch platforms");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPlatforms(data.platforms); // Supposons que setGames est utilisé pour stocker la liste des jeux
+      })
+      .catch((error) => {
+        console.error("Error fetching platforms:", error);
+      });
+  };
+
   useEffect(() => {
     if (existingGame) {
       setName(existingGame.name);
@@ -61,6 +77,10 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
       setIsEditing(true);
     }
   }, [existingGame]);
+
+  useEffect(() => {
+    loadPlatforms();
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
@@ -152,34 +172,6 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
     setErrors([]);
   };
 
-  const homeConsoles = [
-    // Trier les consoles par ordre alphabétique
-    "PlayStation 2",
-    "GameCube",
-    "Xbox",
-    "Wii",
-    "PlayStation 3",
-    "Xbox 360",
-    "Wii U",
-    "PlayStation 4",
-    "Xbox One",
-    "Nintendo Switch",
-    "PlayStation 5",
-    "Xbox Series X|S",
-  ].sort((console1, console2) =>
-    console1.localeCompare(console2, "fr-FR", { ignorePunctuation: true }),
-  );
-
-  const portableConsoles = [
-    "Nintendo DS",
-    "PlayStation Portable",
-    "PlayStation Vita",
-    "Nintendo 3DS",
-    "Nintendo Switch Lite",
-  ].sort((console1, console2) =>
-    console1.localeCompare(console2, "fr-FR", { ignorePunctuation: true }),
-  );
-
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Stack
@@ -192,14 +184,6 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
             {isEditing ? t("gameForm.editGame") : t("gameForm.addGame")}
           </Typography>
         </Box>
-        <Collapse in={isSuccess}>
-          <CustomAlert
-            severity="success"
-            data-testid="app.gameForm.alert.success"
-          >
-            {t("gameForm.success")}
-          </CustomAlert>
-        </Collapse>
         <Collapse in={hasError}>
           <CustomAlert severity="error" data-testid="app.gameForm.alert.error">
             <List>
@@ -256,16 +240,9 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
               required
               variant="filled"
             >
-              <ListSubheader>Consoles de Salon</ListSubheader>
-              {homeConsoles.map((console) => (
-                <MenuItem key={console} value={console}>
-                  {console}
-                </MenuItem>
-              ))}
-              <ListSubheader>Consoles Portables</ListSubheader>
-              {portableConsoles.map((console) => (
-                <MenuItem key={console} value={console}>
-                  {console}
+              {platforms.map((platform) => (
+                <MenuItem key={platform.id} value={platform.id}>
+                  {platform.name}
                 </MenuItem>
               ))}
             </Select>
