@@ -27,12 +27,12 @@ jobs:
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
         with:
-          build: npm run build --workspace=video-game-manager-frontend
+          build: npm run build --workspace=frontend
           # Starts web server for E2E tests - replace with your own server invocation
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
-          start: npm run preview --workspace=video-game-manager-frontend
+          start: npm run preview --workspace=frontend
           wait-on: 'http://localhost:4173' # Waits for above
-          command: npm run cy:run --workspace=video-game-manager-frontend
+          command: npm run cy:run --workspace=frontend
           # Records to Cypress Cloud 
           # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
           record: true

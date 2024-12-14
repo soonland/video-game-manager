@@ -53,6 +53,13 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
     onEditGame(gameIds);
   };
 
+  const handleClose = (e, reason) => {
+    if (reason === "backdropClick") {
+      return;
+    }
+    setDialogOpen(false);
+  };
+
   return (
     <>
       <Box
@@ -92,7 +99,7 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
       </Box>
       <ConfirmationDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={handleClose}
         onConfirm={() => handleDelete()}
       />
     </>

@@ -40,7 +40,7 @@ const GameItem = ({ game, onDelete, onEdit, onCheck, isChecked }) => {
             color="info"
             aria-label="edit"
             data-testid={`gameList.item.edit.${game.id}`}
-            onClick={() => onEdit(game.id)}
+            onClick={() => onEdit(parseInt(game.id, 10))}
           >
             <Edit />
           </IconButton>

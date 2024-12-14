@@ -2,7 +2,37 @@
   "app": {
     "title": "Bibliothèque de jeux",
     "confirmDeletionTitle": "Confirmer la suppression",
-    "confirmDeletionMessage": "Êtes-vous sûr de vouloir supprimer ce jeu ?"
+    "confirmDeletionMessage": "Êtes-vous sûr de vouloir supprimer ce jeu ?",
+    "settingsMenu": {
+      "settings": "Paramètres",
+      "lang": {
+        "fr": "Français",
+        "en": "Anglais"
+      },
+      "darkMode": "Mode sombre",
+      "lightMode": "Mode clair",
+      "platforms": "Plateformes",
+      "genres": "Genres",
+      "about": "À propos"
+    },
+    "modal": {
+      "common": {
+        "close": "Fermer"
+      },
+      "platforms": {
+        "title": "Plateformes",
+        "add": "Ajouter une plateforme",
+        "edit": "Modifier la plateforme",
+        "name": "Nom de la plateforme",
+        "year": "Année de lancement",
+        "errorName": "Veuillez entrer un nom",
+        "errorAdd": "Une erreur s'est produite lors de l'ajout de la plateforme",
+        "errorEdit": "Une erreur s'est produite lors de la modification de la plateforme",
+        "added": "La plateforme a été ajoutée avec succès",
+        "updated": "La plateforme a été mise à jour avec succès",
+        "deleted": "La plateforme a été supprimée avec succès"
+      }
+    }
   },
   "gameList": {
     "name": "Nom",
@@ -27,7 +57,9 @@
     "errorGenre": "Veuillez sélectionner un genre",
     "errorAdd": "Une erreur s'est produite lors de l'ajout du jeu",
     "errorEdit": "Une erreur s'est produite lors de la modification du jeu",
-    "success": "Le jeu a été ajouté avec succès"
+    "added": "Le jeu a été ajouté avec succès",
+    "updated": "Le jeu a été mis à jour avec succès",
+    "deleted": "Le jeu a été supprimé avec succès"
   },
   "button": {
     "add": "Ajouter un jeu",

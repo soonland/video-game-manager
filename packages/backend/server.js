@@ -17,11 +17,19 @@ const db = new sqlite3.Database('./games.db', (err) => {
 // Création de la table "games" si elle n'existe pas
 db.run(
   `CREATE TABLE IF NOT EXISTS games (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    year INTEGER NOT NULL,
+    platform INTEGER NOT NULL,
+    genre TEXT NOT NULL
+    )`
+  );
+// Création de la table "platforms" si elle n'existe pas
+db.run(
+  `CREATE TABLE IF NOT EXISTS platforms (
      id INTEGER PRIMARY KEY AUTOINCREMENT,
      name TEXT NOT NULL,
-     year INTEGER NOT NULL,
-     platform TEXT NOT NULL,
-     genre TEXT NOT NULL
+     year INTEGER NOT NULL
    )`
 );
 
@@ -104,6 +112,89 @@ fastify.put('/api/games/:id', (request, reply) => {
       reply.status(400).send({ error: err.message });
     } else {
       reply.send({ message: 'Game updated successfully!' });
+    }
+  });
+});
+
+// Route pour récupérer toutes les plateformes
+fastify.get('/api/platforms', (request, reply) => {
+  const sql = 'SELECT * FROM platforms';
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      reply.status(400).send({ error: err.message });
+    } else {
+      const protocol = request.protocol;
+      const hostname = request.hostname;
+      const port = request.port;
+      rows = rows.map((platform) => {
+        platform.href = `${protocol}://${hostname}:${port}/api/platforms/${platform.id}`;
+        return platform;
+      });
+      reply.send({ platforms: rows });
+    }
+  });
+});
+
+// Route pour récupérer une plateforme par son ID
+fastify.get('/api/platforms/:id', (request, reply) => {
+  const { id } = request.params;
+  const sql = 'SELECT * FROM platforms WHERE id = ?';
+  db.get(sql, [id], (err, row) => {
+    if (err) {
+      reply.status(400).send({ error: err.message });
+    } else if (row) {
+      // Ajout de l'URL de l'API pour récupérer la plateforme
+      const protocol = request.protocol;
+      const hostname = request.hostname;
+      const port = request.port;
+      row.href = `${protocol}://${hostname}:${port}/api/platforms/${row.id}`;
+      reply.send({ platform: row });
+    } else {
+      reply.status(404).send({ error: 'Platform not found' });
+    }
+  });
+});
+
+// Route pour ajouter une nouvelle plateforme
+fastify.post('/api/platforms', (request, reply) => {
+  const { name, year } = request.body;
+  const sql = 'INSERT INTO platforms (name, year) VALUES (?, ?)';
+
+  // Utilisation de `db.run` sans RETURNING
+  db.run(sql, [name, year], function (err) {
+    if (err) {
+      // Gestion des erreurs
+      reply.status(400).send({ error: err.message });
+    } else {
+      // `this.lastID` pour récupérer l'ID de la dernière ligne insérée
+      reply.send({ message: 'Platform added successfully!', id: this.lastID });
+    }
+  });
+});
+
+// Route pour supprimer une plateforme
+fastify.delete('/api/platforms/:id', (request, reply) => {
+  const { id } = request.params;
+  const sql = 'DELETE FROM platforms WHERE id = ?';
+  db.run(sql, id, (err) => {
+    if (err) {
+      reply.status(400).send({ error: err.message });
+    } else {
+      reply.send({ message: 'Platform deleted successfully!' });
+    }
+  });
+});
+
+// Route pour modifier une plateforme
+fastify.put('/api/platforms/:id', (request, reply) => {
+  const { id } = request.params;
+  const { name, manufacturer } = request.body;
+  const sql = 'UPDATE platforms SET name = ?, manufacturer = ? WHERE id = ?';
+  db.run(sql, [name, manufacturer, id], (err) => {
+    if (err) {
+      reply.status(400).send({ error: err.message });
+    } else {
+      reply.send({ message: 'Platform updated successfully!' });
     }
   });
 });

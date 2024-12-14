@@ -2,7 +2,37 @@
   "app": {
     "title": "Game library",
     "confirmDeletionTitle": "Confirm deletion",
-    "confirmDeletionMessage": "Are you sure you want to delete this game?"
+    "confirmDeletionMessage": "Are you sure you want to delete this game?",
+    "settingsMenu": {
+      "settings": "Settings",
+      "lang": {
+        "fr": "French",
+        "en": "English"
+      },
+      "darkMode": "Dark mode",
+      "lightMode": "Light mode",
+      "platforms": "Platforms",
+      "genres": "Genres",
+      "about": "About"
+    },
+    "modal": {
+      "common": {
+        "close": "Close"
+      },
+      "platforms": {
+        "title": "Platforms",
+        "add": "Add platform",
+        "edit": "Edit platform",
+        "name": "Platform name",
+        "year": "Launch year",
+        "errorName": "Please enter a name",
+        "errorAdd": "An error occurred while adding the platform",
+        "errorEdit": "An error occurred while editing the platform",
+        "added": "The platform has been successfully added",
+        "updated": "The platform has been successfully updated",
+        "deleted": "The platform has been successfully deleted"
+      }
+    }
   },
   "gameList": {
     "name": "Name",
@@ -27,7 +57,9 @@
     "errorGenre": "Please select a genre",
     "errorAdd": "An error occurred while adding the game",
     "errorEdit": "An error occurred while editing the game",
-    "success": "The game has been successfully added"
+    "added": "The game has been successfully added",
+    "updated": "The game has been successfully updated",
+    "deleted": "The game has been successfully deleted"
   },
   "button": {
     "add": "Add game",
