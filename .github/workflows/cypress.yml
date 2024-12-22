@@ -25,7 +25,7 @@ jobs:
 
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
-        uses: cypress-io/github-action@v6.7.7
+        uses: cypress-io/github-action@v6
         with:
           build: npm run build --workspace=frontend
           # Starts web server for E2E tests - replace with your own server invocation
