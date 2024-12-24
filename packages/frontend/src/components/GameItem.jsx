@@ -1,4 +1,4 @@
-import { Edit } from "@mui/icons-material";
+import { Edit, Info } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   ListItem as MuiListItem,
@@ -24,10 +24,17 @@ const ListItem = styled(MuiListItem)(() => ({
   },
 }));
 
-const GameItem = ({ game, onDelete, onEdit, onCheck, isChecked }) => {
+const GameItem = ({
+  game,
+  onDelete,
+  onEdit,
+  onCheck,
+  onViewDetails,
+  isChecked,
+}) => {
   const { t } = useTranslation();
 
-  const subText = `${t("gameList.year")} : ${game.year} ${t("gameList.genre")} : ${game.genre}`;
+  const subText = `${t("gameList.platform")} : ${game.platform?.name || ""}`;
   const labelId = `checkbox-list-label-${game.id}`;
   return (
     <ListItem
@@ -35,6 +42,15 @@ const GameItem = ({ game, onDelete, onEdit, onCheck, isChecked }) => {
       data-testid={`gameList.item.root.${game.id}`}
       secondaryAction={
         <Stack direction={"row"} spacing={1}>
+          <IconButton
+            edge="end"
+            color="primary"
+            aria-label="view details"
+            data-testid={`gameList.item.viewDetails.${game.id}`}
+            onClick={() => onViewDetails(game.id)}
+          >
+            <Info />
+          </IconButton>
           <IconButton
             edge="end"
             color="info"
@@ -93,6 +109,7 @@ GameItem.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onCheck: PropTypes.func.isRequired,
+  onViewDetails: PropTypes.func.isRequired,
 };
 
 export default GameItem;

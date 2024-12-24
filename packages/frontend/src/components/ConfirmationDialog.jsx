@@ -1,11 +1,14 @@
+import { Close } from "@mui/icons-material";
 import {
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
   Button,
   CircularProgress,
+  Box,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -23,9 +26,28 @@ const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} disableEscapeKeyDown>
-      <DialogTitle>{t("app.confirmDeletionTitle")}</DialogTitle>
-      <DialogContent>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      disableEscapeKeyDown
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {t("app.confirmDeletionTitle")}
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent dividers>
         <DialogContentText>{t("app.confirmDeletionMessage")}</DialogContentText>
       </DialogContent>
       <DialogActions>

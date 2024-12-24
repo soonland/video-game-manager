@@ -1,7 +1,7 @@
 describe("Home Page", () => {
   it("should check the home page", () => {
     cy.visit("/");
-    cy.intercept("GET", "/api/games").as("getGames");
+    cy.intercept("GET", "/api/games?$expand=platform").as("getGames");
     cy.intercept("GET", "/api/platforms").as("getPlatforms");
 
     cy.get("[data-test='app.gameForm.buttons']").should("exist");

@@ -4,6 +4,7 @@ import {
   SportsEsports as SportsEsportsIcon,
 } from "@mui/icons-material";
 import {
+  Chip,
   Container,
   Typography,
   CssBaseline,
@@ -16,6 +17,11 @@ import {
   ListItemText,
   Snackbar,
   Alert,
+  TextField,
+  Select,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useState, useEffect, Suspense } from "react";
@@ -37,6 +43,9 @@ const App = () => {
   const open = Boolean(anchorEl);
   const theme = useTheme();
   const [lng, setLng] = useState(i18n.language);
+  const [platforms, setPlatforms] = useState([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const changeLanguage = () => {
     setLng(lng === "en" ? "fr" : "en");
@@ -44,7 +53,7 @@ const App = () => {
   };
 
   const loadGames = async () => {
-    fetch("/api/games")
+    fetch("/api/games?$expand=platform")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch games");
@@ -59,8 +68,16 @@ const App = () => {
       });
   };
 
+  const loadPlatforms = async () => {
+    fetch("/api/platforms")
+      .then((response) => response.json())
+      .then((data) => setPlatforms(data.platforms))
+      .catch((error) => console.error("Error fetching platforms:", error));
+  };
+
   useEffect(() => {
     loadGames();
+    loadPlatforms();
   }, []);
 
   const addGame = async (gameData) => {
@@ -155,6 +172,23 @@ const App = () => {
     setOpenSettings(false);
   };
 
+  const handlePlatformChange = (event) => {
+    setSelectedPlatforms(event.target.value);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredGames = games.filter((game) => {
+    return (
+      (selectedPlatforms.length === 0 ||
+        selectedPlatforms.includes(game.platform.id)) &&
+      (!searchTerm ||
+        game.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  });
+
   return (
     <Suspense fallback="loading">
       <CssBaseline />
@@ -224,12 +258,57 @@ const App = () => {
             onReset={onReset}
           />
         </Box>
+        <Box sx={{ my: 2 }}>
+          <Stack direction="row" spacing={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("app.filter.platform")}</InputLabel>
+              <Select
+                multiple
+                value={selectedPlatforms}
+                onChange={handlePlatformChange}
+                input={
+                  <OutlinedInput
+                    id="select-multiple-chip"
+                    label={t("app.filter.platform")}
+                  />
+                }
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={platforms.find((p) => p.id === value)?.name}
+                      />
+                    ))}
+                  </Box>
+                )}
+              >
+                {platforms.map((platform) => (
+                  <MenuItem key={platform.id} value={platform.id}>
+                    {platform.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label={t("app.filter.search")}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              size="small"
+            />
+          </Stack>
+        </Box>
         <GameList
-          games={games}
+          games={filteredGames}
           onDeleteGame={deleteGame}
           onEditGame={editGame}
         />
-        <SettingsPanel open={openSettings} onClose={handleCloseSettings} />
+        {openSettings && (
+          <SettingsPanel open={openSettings} onClose={handleCloseSettings} />
+        )}
         <Snackbar
           data-testid="app.snackbar"
           open={snackbarOpen}

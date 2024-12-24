@@ -32,6 +32,10 @@
         "updated": "La plateforme a été mise à jour avec succès",
         "deleted": "La plateforme a été supprimée avec succès"
       }
+    },
+    "filter": {
+      "platform": "Plateforme",
+      "search": "Rechercher par nom de jeu"
     }
   },
   "gameList": {

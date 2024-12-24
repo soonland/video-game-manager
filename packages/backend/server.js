@@ -23,7 +23,7 @@ db.run(
     platform INTEGER NOT NULL,
     genre TEXT NOT NULL
     )`
-  );
+);
 // Création de la table "platforms" si elle n'existe pas
 db.run(
   `CREATE TABLE IF NOT EXISTS platforms (
@@ -35,19 +35,55 @@ db.run(
 
 // Route pour récupérer tous les jeux
 fastify.get('/api/games', (request, reply) => {
-  const sql = 'SELECT * FROM games';
-  db.all(sql, [], (err, rows) => {
+  const { $expand, $filter, $search } = request.query;
+  let sql = $expand === 'platform'
+    ? `SELECT games.*, platforms.name as platform_name, platforms.year as platform_year, platforms.id as platform_id
+       FROM games
+       LEFT JOIN platforms ON games.platform = platforms.id`
+    : 'SELECT * FROM games';
+
+  const params = [];
+  const conditions = [];
+
+  if ($filter) {
+    const filterParts = $filter.split(' ');
+    if (filterParts[0] === 'platform' && filterParts[1] === 'eq') {
+      conditions.push('games.platform = ?');
+      params.push(filterParts[2]);
+    }
+  }
+
+  if ($search) {
+    conditions.push('games.name LIKE ?');
+    params.push(`%${$search}%`);
+  }
+
+  if (conditions.length > 0) {
+    sql += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  db.all(sql, params, (err, rows) => {
     if (err) {
       reply.status(400).send({ error: err.message });
     } else {
       const protocol = request.protocol;
       const hostname = request.hostname;
       const port = request.port;
-      rows = rows.map((game) => {
+      const games = rows.map((game) => {
         game.href = `${protocol}://${hostname}:${port}/api/games/${game.id}`;
+        if ($expand === 'platform') {
+          game.platform = {
+            id: game.platform_id,
+            name: game.platform_name,
+            year: game.platform_year,
+          };
+          delete game.platform_id;
+          delete game.platform_name;
+          delete game.platform_year;
+        }
         return game;
       });
-      reply.send({ games: rows });
+      reply.send({ games });
     }
   });
 });
@@ -65,7 +101,17 @@ fastify.get('/api/games/:id', (request, reply) => {
       const hostname = request.hostname;
       const port = request.port;
       row.href = `${protocol}://${hostname}:${port}/api/games/${row.id}`;
-      reply.send({ game: row });
+
+      // Récupérer l'objet représentant la console
+      const platformSql = 'SELECT * FROM platforms WHERE id = ?';
+      db.get(platformSql, [row.platform], (platformErr, platformRow) => {
+        if (platformErr) {
+          reply.status(400).send({ error: platformErr.message });
+        } else {
+          row.platform = platformRow;
+          reply.send({ game: row });
+        }
+      });
     } else {
       reply.status(404).send({ error: 'Game not found' });
     }
@@ -160,13 +206,10 @@ fastify.post('/api/platforms', (request, reply) => {
   const { name, year } = request.body;
   const sql = 'INSERT INTO platforms (name, year) VALUES (?, ?)';
 
-  // Utilisation de `db.run` sans RETURNING
   db.run(sql, [name, year], function (err) {
     if (err) {
-      // Gestion des erreurs
       reply.status(400).send({ error: err.message });
     } else {
-      // `this.lastID` pour récupérer l'ID de la dernière ligne insérée
       reply.send({ message: 'Platform added successfully!', id: this.lastID });
     }
   });
@@ -188,9 +231,9 @@ fastify.delete('/api/platforms/:id', (request, reply) => {
 // Route pour modifier une plateforme
 fastify.put('/api/platforms/:id', (request, reply) => {
   const { id } = request.params;
-  const { name, manufacturer } = request.body;
-  const sql = 'UPDATE platforms SET name = ?, manufacturer = ? WHERE id = ?';
-  db.run(sql, [name, manufacturer, id], (err) => {
+  const { name, year } = request.body;
+  const sql = 'UPDATE platforms SET name = ?, year = ? WHERE id = ?';
+  db.run(sql, [name, year, id], (err) => {
     if (err) {
       reply.status(400).send({ error: err.message });
     } else {
