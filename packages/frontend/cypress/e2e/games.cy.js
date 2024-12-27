@@ -1,62 +1,60 @@
-const interceptGames = () => {
-  cy.intercept("GET", "/api/games?$expand=platform", {
-    body: {
-      games: [
-        {
-          id: 1,
-          name: "Mass Effect",
-          year: 2007,
-          platform: { id: 1, name: "Xbox 360", year: 2005 },
-          genre: "Action",
-        },
-        {
-          id: 2,
-          name: "Mass Effect 2",
-          year: 2010,
-          platform: { id: 1, name: "Xbox 360", year: 2005 },
-          genre: "Action",
-        },
-        {
-          id: 3,
-          name: "Mass Effect 3",
-          year: 2012,
-          platform: { id: 1, name: "Xbox 360", year: 2005 },
-          genre: "Action",
-        },
-        {
-          id: 4,
-          name: "Mass Effect Legendary Edition",
-          year: 2021,
-          platform: { id: 3, name: "Xbox Series X|S", year: 2020 },
-          genre: "Action",
-        },
-        {
-          id: 5,
-          name: "Mass Effect Andromeda",
-          year: 2017,
-          platform: { id: 2, name: "Xbox One", year: 2013 },
-          genre: "Action",
-        },
-      ],
-    },
-  }).as("getGames");
-};
+const mockGames = [
+  {
+    id: 1,
+    name: "Mass Effect",
+    year: 2007,
+    platform: { id: 1, name: "Xbox 360", year: 2005 },
+    genre: "Action",
+  },
+  {
+    id: 2,
+    name: "Mass Effect 2",
+    year: 2010,
+    platform: { id: 1, name: "Xbox 360", year: 2005 },
+    genre: "Action",
+  },
+  {
+    id: 3,
+    name: "Mass Effect 3",
+    year: 2012,
+    platform: { id: 1, name: "Xbox 360", year: 2005 },
+    genre: "Action",
+  },
+  {
+    id: 4,
+    name: "Mass Effect Legendary Edition",
+    year: 2021,
+    platform: { id: 3, name: "Xbox Series X|S", year: 2020 },
+    genre: "Action",
+  },
+  {
+    id: 5,
+    name: "Mass Effect Andromeda",
+    year: 2017,
+    platform: { id: 2, name: "Xbox One", year: 2013 },
+    genre: "Action",
+  },
+];
 
-const interceptPlatforms = () => {
-  cy.intercept("GET", "/api/platforms", {
-    platforms: [
-      { id: 1, name: "Xbox 360", year: 2005 },
-      { id: 2, name: "Xbox One", year: 2013 },
-      { id: 3, name: "Xbox Series X|S", year: 2020 },
-    ],
-  }).as("getPlatforms");
+const mockPlatforms = [
+  { id: 1, name: "Xbox 360", year: 2005 },
+  { id: 2, name: "Xbox One", year: 2013 },
+  { id: 3, name: "Xbox Series X|S", year: 2020 },
+];
+
+const interceptGamesAndPlatforms = () => {
+  cy.intercept("GET", "/api/games?$expand=platform", {
+    body: { games: mockGames },
+  }).as("getGames");
+  cy.intercept("GET", "/api/platforms", { platforms: mockPlatforms }).as(
+    "getPlatforms",
+  );
 };
 
 describe("Games panel", () => {
   it("should add a new game", () => {
     cy.visit("/");
-    interceptGames();
-    interceptPlatforms();
+    interceptGamesAndPlatforms();
     cy.intercept("POST", "/api/games", {
       statusCode: 200,
       body: { message: "Game added successfully!", id: 6 },
@@ -78,7 +76,7 @@ describe("Games panel", () => {
 
   it("should delete a game", () => {
     cy.visit("/");
-    interceptGames();
+    interceptGamesAndPlatforms();
     cy.intercept("DELETE", /\/api\/games\/\d+$/).as("deleteGame");
 
     cy.wait("@getGames");
@@ -96,7 +94,7 @@ describe("Games panel", () => {
 
   it("should check all games", () => {
     cy.visit("/");
-    interceptGames();
+    interceptGamesAndPlatforms();
 
     cy.wait("@getGames");
 

@@ -7,6 +7,23 @@ const validateButtons = (type, disabledIds, enabledIds) => {
   });
 };
 
+const interceptGamesAndPlatforms = (games, platforms) => {
+  cy.intercept("GET", "/api/games?$expand=platform", { games }).as("getGames");
+  cy.intercept("GET", "/api/platforms", { platforms }).as("getPlatforms");
+};
+
+const mockGames = [
+  { id: 1, name: "Game 1", year: 2020, platform: 1, genre: "Action" },
+  { id: 2, name: "Game 2", year: 2021, platform: 2, genre: "Adventure" },
+];
+
+const mockPlatforms = [
+  { id: 1, name: "Xbox 360", year: 2005 },
+  { id: 2, name: "Xbox One", year: 2013 },
+  { id: 3, name: "PlayStation 4", year: 2013 },
+  { id: 4, name: "PlayStation 5", year: 2020 },
+];
+
 describe("Platforms Settings", () => {
   beforeEach(() => {
     cy.interceptApiCalls();
@@ -27,20 +44,7 @@ describe("Platforms Settings", () => {
   });
 
   it("should disable edit buttons if platform is associated with games", () => {
-    cy.intercept("GET", "/api/games?$expand=platform", {
-      games: [
-        { id: 1, name: "Game 1", year: 2020, platform: 1, genre: "Action" },
-        { id: 2, name: "Game 2", year: 2021, platform: 2, genre: "Adventure" },
-      ],
-    }).as("getGames");
-    cy.intercept("GET", "/api/platforms", {
-      platforms: [
-        { id: 1, name: "Xbox 360", year: 2005 },
-        { id: 2, name: "Xbox One", year: 2013 },
-        { id: 3, name: "PlayStation 4", year: 2013 },
-        { id: 4, name: "PlayStation 5", year: 2020 },
-      ],
-    }).as("getPlatforms");
+    interceptGamesAndPlatforms(mockGames, mockPlatforms);
 
     cy.visitSettingsPanel();
     cy.wait("@getGames");
@@ -51,8 +55,8 @@ describe("Platforms Settings", () => {
   });
 
   it("should disable delete buttons if platform is associated with games", () => {
-    cy.intercept("GET", "/api/games**", {
-      games: [
+    interceptGamesAndPlatforms(
+      [
         {
           id: 1,
           name: "Game 1",
@@ -68,15 +72,8 @@ describe("Platforms Settings", () => {
           genre: "Adventure",
         },
       ],
-    }).as("getGames");
-    cy.intercept("GET", "/api/platforms", {
-      platforms: [
-        { id: 1, name: "Xbox 360", year: 2005 },
-        { id: 2, name: "Xbox One", year: 2013 },
-        { id: 3, name: "PlayStation 4", year: 2013 },
-        { id: 4, name: "PlayStation 5", year: 2020 },
-      ],
-    }).as("getPlatforms");
+      mockPlatforms,
+    );
 
     cy.visitSettingsPanel();
     cy.wait("@getGames");
