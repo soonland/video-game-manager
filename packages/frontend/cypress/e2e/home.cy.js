@@ -26,7 +26,7 @@ describe("Home Page", () => {
 
     cy.wait("@getGames");
     cy.wait("@getPlatforms");
-    cy.get("[data-testid='app.settingsButton")
+    cy.get("[data-testid='app.settingsButton']")
       .should("be.visible")
       .should("be.enabled")
       .click();
