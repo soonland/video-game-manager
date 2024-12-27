@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import ConfirmationDialog from "./ConfirmationDialog";
+import GameDetail from "./GameDetail"; // Importer le modal générique
 import GameItem from "./GameItem";
 import ListControl from "./ListControl";
 
@@ -11,6 +12,8 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [checked, setChecked] = useState([]);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   const addToList = (gameId) => {
     setChecked([...checked, gameId]);
@@ -60,6 +63,17 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
     setDialogOpen(false);
   };
 
+  const handleViewDetails = (gameId) => {
+    const game = games.find((g) => g.id === gameId);
+    setSelectedGame(game);
+    setDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
+    setSelectedGame(null);
+  };
+
   return (
     <>
       <Box
@@ -91,6 +105,7 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
                   onEdit={() => handleEdit(game.id)}
                   isChecked={checked.includes(game.id)}
                   onCheck={() => handleCheck(game.id)}
+                  onViewDetails={handleViewDetails}
                 />
               );
             })}
@@ -101,6 +116,11 @@ const GameList = ({ games, onDeleteGame, onEditGame }) => {
         open={dialogOpen}
         onClose={handleClose}
         onConfirm={() => handleDelete()}
+      />
+      <GameDetail
+        open={detailsOpen}
+        onClose={handleCloseDetails}
+        game={selectedGame}
       />
     </>
   );

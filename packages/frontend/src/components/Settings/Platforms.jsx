@@ -35,6 +35,7 @@ const SettingsPanel = ({ open, onClose }) => {
   const [editingYear, setEditingYear] = useState(currentYear);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [games, setGames] = useState([]);
 
   // Générer la liste des années, de manière décroissante.
   const years = Array.from(
@@ -59,31 +60,52 @@ const SettingsPanel = ({ open, onClose }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ name: newPlatformName, year: newYear }),
-        });
-        const newPlatform = {
-          name: newPlatformName,
-          year: newYear,
-        };
-        setPlatforms([...platforms, newPlatform]);
-        setNewPlatformName("");
-        setNewYear(currentYear);
-        setSnackbarMessage(t("app.modal.platforms.added"));
-        setSnackbarOpen(true);
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const newPlatform = {
+              id: data.id, // Assurez-vous que l'API renvoie l'ID de la nouvelle plateforme
+              name: newPlatformName,
+              year: newYear,
+            };
+            setPlatforms([...platforms, newPlatform]);
+            setNewPlatformName("");
+            setNewYear(currentYear);
+            setSnackbarMessage(t("app.modal.platforms.added"));
+            setSnackbarOpen(true);
+          });
       });
     }
   };
 
-  const handleEditPlatform = (index) => {
-    setEditingIndex(index);
-    setEditingPlatformName(platforms[index].name);
-    setEditingYear(platforms[index].year);
+  const handleEditPlatform = (platformId) => {
+    setEditingIndex(platformId);
+    setEditingPlatformName(
+      platforms.filter((el) => el.id === platformId)[0].name,
+    );
+    setEditingYear(platforms.filter((el) => el.id === platformId)[0].year);
+  };
+
+  const updatePlatform = async () => {
+    const response = await fetch(`/api/platforms/${editingIndex}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: editingPlatformName,
+        year: editingYear,
+      }),
+    });
+    return response.json();
   };
 
   const handleUpdatePlatform = () => {
-    simulateDatabaseDelay(() => {
-      const updatedPlatforms = platforms.map((platform, index) =>
-        index === editingIndex
-          ? { name: editingPlatformName, year: editingYear }
+    simulateDatabaseDelay(async () => {
+      await updatePlatform();
+      const updatedPlatforms = platforms.map((platform) =>
+        platform.id === editingIndex
+          ? { ...platform, name: editingPlatformName, year: editingYear }
           : platform,
       );
       setPlatforms(updatedPlatforms);
@@ -95,12 +117,12 @@ const SettingsPanel = ({ open, onClose }) => {
     });
   };
 
-  const handleDeletePlatform = (index) => {
+  const handleDeletePlatform = (platformId) => {
     simulateDatabaseDelay(() => {
-      fetch(`/api/platforms/${platforms[index].id}`, {
+      fetch(`/api/platforms/${platformId}`, {
         method: "DELETE",
       });
-      const updatedPlatforms = platforms.filter((_, i) => i !== index);
+      const updatedPlatforms = platforms.filter(({ id }) => id !== platformId);
       setPlatforms(updatedPlatforms);
       setSnackbarMessage(t("app.modal.platforms.deleted"));
       setSnackbarOpen(true);
@@ -128,6 +150,22 @@ const SettingsPanel = ({ open, onClose }) => {
       });
   };
 
+  const loadGames = async () => {
+    fetch("/api/games?$expand=platform")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch games");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setGames(data.games);
+      })
+      .catch((error) => {
+        console.error("Error fetching games:", error);
+      });
+  };
+
   const handleClose = () => {
     if (newPlatformName.trim() && newYear) {
       // show modal for leaving without saving
@@ -141,7 +179,12 @@ const SettingsPanel = ({ open, onClose }) => {
 
   useEffect(() => {
     loadPlatforms();
+    loadGames();
   }, []);
+
+  const isPlatformAssociatedWithGames = (platformId) => {
+    return games.some((game) => game.platform.id === platformId);
+  };
 
   return (
     <>
@@ -149,12 +192,12 @@ const SettingsPanel = ({ open, onClose }) => {
         <DialogTitle>{t("app.modal.platforms.title")}</DialogTitle>
         <DialogContent>
           <List>
-            {platforms.map((platform, index) => (
+            {platforms.map((platform) => (
               <ListItem
                 key={platform.id}
                 sx={{ display: "flex", alignItems: "center", padding: 0 }}
               >
-                {editingIndex === index ? (
+                {editingIndex === platform.id ? (
                   <>
                     <TextField
                       value={editingPlatformName}
@@ -163,6 +206,7 @@ const SettingsPanel = ({ open, onClose }) => {
                       fullWidth
                       size="small"
                       sx={{ marginRight: "8px" }}
+                      data-testid={`platform-name-${platform.id}`}
                     />
                     <FormControl
                       fullWidth
@@ -174,6 +218,7 @@ const SettingsPanel = ({ open, onClose }) => {
                         value={editingYear}
                         onChange={(e) => setEditingYear(Number(e.target.value))}
                         label={t("app.modal.platforms.year")}
+                        data-testid={`platform-year-${platform.id}`}
                       >
                         {years.map((year) => (
                           <MenuItem key={`year-${year}`} value={year}>
@@ -186,20 +231,23 @@ const SettingsPanel = ({ open, onClose }) => {
                 ) : (
                   <ListItemText
                     primary={`${platform.name} (${platform.year})`}
+                    data-testid={`platform-${platform.id}`}
                   />
                 )}
                 <Stack direction={"row"}>
-                  {editingIndex === index ? (
+                  {editingIndex === platform.id ? (
                     <>
                       <IconButton
                         onClick={handleUpdatePlatform}
                         aria-label="Save"
+                        data-testid={`save-platform-${platform.id}`}
                       >
                         <Check />
                       </IconButton>
                       <IconButton
                         onClick={() => setEditingIndex(null)}
                         aria-label="Cancel"
+                        data-testid={`cancel-platform-${platform.id}`}
                       >
                         <Cancel />
                       </IconButton>
@@ -207,14 +255,17 @@ const SettingsPanel = ({ open, onClose }) => {
                   ) : (
                     <>
                       <IconButton
-                        onClick={() => handleEditPlatform(index)}
+                        onClick={() => handleEditPlatform(platform.id)}
                         aria-label="Edit"
+                        data-testid={`edit-platform-${platform.id}`}
                       >
                         <Edit />
                       </IconButton>
                       <IconButton
-                        onClick={() => handleDeletePlatform(index)}
+                        onClick={() => handleDeletePlatform(platform.id)}
                         aria-label="Delete"
+                        data-testid={`delete-platform-${platform.id}`}
+                        disabled={isPlatformAssociatedWithGames(platform.id)}
                       >
                         <Delete />
                       </IconButton>
@@ -239,6 +290,7 @@ const SettingsPanel = ({ open, onClose }) => {
                 fullWidth
                 size="small"
                 sx={{ marginBottom: "8px" }}
+                data-testid="new-platform-name"
               />
               <FormControl fullWidth sx={{ marginBottom: "8px" }} size="small">
                 <InputLabel>{t("app.modal.platforms.year")}</InputLabel>
@@ -246,6 +298,7 @@ const SettingsPanel = ({ open, onClose }) => {
                   value={newYear}
                   onChange={(e) => setNewYear(Number(e.target.value))}
                   label={t("app.modal.platforms.year")}
+                  data-testid="new-platform-year"
                 >
                   {years.map((year) => (
                     <MenuItem key={`new-year-${year}`} value={year}>
@@ -254,10 +307,18 @@ const SettingsPanel = ({ open, onClose }) => {
                   ))}
                 </Select>
               </FormControl>
-              <IconButton onClick={handleAddPlatform} aria-label="Add platform">
+              <IconButton
+                onClick={handleAddPlatform}
+                aria-label="Add platform"
+                data-testid="add-platform"
+              >
                 <Add />
               </IconButton>
-              <IconButton onClick={clearFields} aria-label="Add platform">
+              <IconButton
+                onClick={clearFields}
+                aria-label="Cancel platform"
+                data-testid="cancel-platform"
+              >
                 <Cancel />
               </IconButton>
             </Stack>
@@ -274,6 +335,7 @@ const SettingsPanel = ({ open, onClose }) => {
               Boolean(newPlatformName.trim())
             }
             startIcon={isProcessing && <CircularProgress size={20} />}
+            data-testid="close-settings"
           >
             {t("app.modal.common.close")}
           </Button>
@@ -290,6 +352,7 @@ const SettingsPanel = ({ open, onClose }) => {
           onClose={() => setSnackbarOpen(false)}
           severity="success"
           sx={{ width: "100%" }}
+          data-testid="app.snackbar"
         >
           {snackbarMessage}
         </Alert>

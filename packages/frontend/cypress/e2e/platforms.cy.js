@@ -1,45 +1,85 @@
+const validateButtons = (type, disabledIds, enabledIds) => {
+  disabledIds.forEach((id) => {
+    cy.get(`[data-testid='${type}-platform-${id}']`).should("be.disabled");
+  });
+  enabledIds.forEach((id) => {
+    cy.get(`[data-testid='${type}-platform-${id}']`).should("be.enabled");
+  });
+};
+
+const interceptGamesAndPlatforms = (games, platforms) => {
+  cy.intercept("GET", "/api/games?$expand=platform", { games }).as("getGames");
+  cy.intercept("GET", "/api/platforms", { platforms }).as("getPlatforms");
+};
+
+const mockGames = [
+  { id: 1, name: "Game 1", year: 2020, platform: 1, genre: "Action" },
+  { id: 2, name: "Game 2", year: 2021, platform: 2, genre: "Adventure" },
+];
+
+const mockPlatforms = [
+  { id: 1, name: "Xbox 360", year: 2005 },
+  { id: 2, name: "Xbox One", year: 2013 },
+  { id: 3, name: "PlayStation 4", year: 2013 },
+  { id: 4, name: "PlayStation 5", year: 2020 },
+];
+
 describe("Platforms Settings", () => {
-  it("should check the Platforms Settings Panel", () => {
-    cy.visit("/");
-    cy.intercept("GET", "/api/games").as("getGames");
-    cy.intercept("GET", "/api/platforms", {
-      platforms: [
-        { id: 1, name: "Xbox 360", year: 2005 },
-        { id: 2, name: "Xbox One", year: 2013 },
-        { id: 3, name: "Xbox Series X|S", year: 2020 },
-        { id: 4, name: "PlayStation 3", year: 2006 },
-        { id: 5, name: "PlayStation 4", year: 2013 },
-        { id: 6, name: "PlayStation 5", year: 2020 },
-        { id: 7, name: "Nintendo Switch", year: 2017 },
-        { id: 8, name: "PC", year: 1981 },
-        { id: 9, name: "iOS", year: 2007 },
-        { id: 10, name: "Android", year: 2008 },
-        { id: 11, name: "Linux", year: 1991 },
-        { id: 12, name: "macOS", year: 2001 },
-        { id: 13, name: "Windows", year: 1985 },
-        { id: 14, name: "Commodore 64", year: 1982 },
-        { id: 15, name: "Amiga", year: 1985 },
-        { id: 16, name: "Atari ST", year: 1985 },
-        { id: 17, name: "MS-DOS", year: 1981 },
-        { id: 18, name: "Apple II", year: 1977 },
-        { id: 19, name: "Atari 2600", year: 1977 },
-        { id: 20, name: "NES", year: 1983 },
-        { id: 21, name: "SNES", year: 1990 },
-        { id: 22, name: "Nintendo 64", year: 1996 },
-        { id: 23, name: "GameCube", year: 2001 },
-        { id: 24, name: "Wii", year: 2006 },
-        { id: 25, name: "Wii U", year: 2012 },
-      ],
-    }).as("getPlatforms");
-
+  beforeEach(() => {
+    cy.interceptApiCalls();
+    cy.visitSettingsPanel();
     cy.wait("@getGames");
-    cy.get("[data-testid='app.settingsButton")
-      .should("be.visible")
-      .should("be.enabled")
-      .click();
+    cy.wait("@getPlatforms");
+  });
 
-    cy.get("[data-testid='app.settingsMenu.platforms']")
-      .should("exist")
-      .click();
+  it("should check the Platforms Settings Panel", () => {
+    // Ajouter une nouvelle plateforme
+    cy.addPlatform("Nintendo Switch", 2017);
+
+    // Modifier la plateforme 2
+    cy.editPlatform(2, "Xbox One X", 2017);
+
+    // Supprimer la nouvelle plateforme ajoutée
+    cy.deletePlatform(7);
+  });
+
+  it("should disable edit buttons if platform is associated with games", () => {
+    interceptGamesAndPlatforms(mockGames, mockPlatforms);
+
+    cy.visitSettingsPanel();
+    cy.wait("@getGames");
+    cy.wait("@getPlatforms");
+
+    // Vérifier les boutons d'édition
+    validateButtons("edit", [], [1, 2, 3, 4]);
+  });
+
+  it("should disable delete buttons if platform is associated with games", () => {
+    interceptGamesAndPlatforms(
+      [
+        {
+          id: 1,
+          name: "Game 1",
+          year: 2020,
+          platform: { id: 1, name: "Xbox 360", year: 2005 },
+          genre: "Action",
+        },
+        {
+          id: 2,
+          name: "Game 2",
+          year: 2021,
+          platform: { id: 2, name: "Xbox One", year: 2013 },
+          genre: "Adventure",
+        },
+      ],
+      mockPlatforms,
+    );
+
+    cy.visitSettingsPanel();
+    cy.wait("@getGames");
+    cy.wait("@getPlatforms");
+
+    // Vérifier les boutons de suppression
+    validateButtons("delete", [1, 2], [3, 4]);
   });
 });
