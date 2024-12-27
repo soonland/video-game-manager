@@ -1,10 +1,21 @@
+const validateButtons = (type, disabledIds, enabledIds) => {
+  disabledIds.forEach((id) => {
+    cy.get(`[data-testid='${type}-platform-${id}']`).should("be.disabled");
+  });
+  enabledIds.forEach((id) => {
+    cy.get(`[data-testid='${type}-platform-${id}']`).should("be.enabled");
+  });
+};
+
 describe("Platforms Settings", () => {
-  it("should check the Platforms Settings Panel", () => {
+  beforeEach(() => {
     cy.interceptApiCalls();
     cy.visitSettingsPanel();
     cy.wait("@getGames");
     cy.wait("@getPlatforms");
+  });
 
+  it("should check the Platforms Settings Panel", () => {
     // Ajouter une nouvelle plateforme
     cy.addPlatform("Nintendo Switch", 2017);
 
@@ -16,7 +27,6 @@ describe("Platforms Settings", () => {
   });
 
   it("should disable edit buttons if platform is associated with games", () => {
-    cy.visit("/");
     cy.intercept("GET", "/api/games?$expand=platform", {
       games: [
         { id: 1, name: "Game 1", year: 2020, platform: 1, genre: "Action" },
@@ -36,15 +46,11 @@ describe("Platforms Settings", () => {
     cy.wait("@getGames");
     cy.wait("@getPlatforms");
 
-    // Vérifier que les boutons d'édition sont activés pour les plateformes sans jeux
-    cy.get("[data-testid='edit-platform-1']").should("be.enabled");
-    cy.get("[data-testid='edit-platform-2']").should("be.enabled");
-    cy.get("[data-testid='edit-platform-3']").should("be.enabled");
-    cy.get("[data-testid='edit-platform-4']").should("be.enabled");
+    // Vérifier les boutons d'édition
+    validateButtons("edit", [], [1, 2, 3, 4]);
   });
 
   it("should disable delete buttons if platform is associated with games", () => {
-    cy.visit("/");
     cy.intercept("GET", "/api/games**", {
       games: [
         {
@@ -76,12 +82,7 @@ describe("Platforms Settings", () => {
     cy.wait("@getGames");
     cy.wait("@getPlatforms");
 
-    // Vérifier que les boutons de suppression sont désactivés pour les plateformes associées à des jeux
-    cy.get("[data-testid='delete-platform-1']").should("be.disabled");
-    cy.get("[data-testid='delete-platform-2']").should("be.disabled");
-
-    // Vérifier que les boutons de suppression sont activés pour les plateformes sans jeux
-    cy.get("[data-testid='delete-platform-3']").should("be.enabled");
-    cy.get("[data-testid='delete-platform-4']").should("be.enabled");
+    // Vérifier les boutons de suppression
+    validateButtons("delete", [1, 2], [3, 4]);
   });
 });
