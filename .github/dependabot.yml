@@ -14,8 +14,8 @@ updates:
       include: "scope"
     schedule:
       interval: "weekly"
-      day: "friday"
-      time: "16:00"
+      day: "monday"
+      time: "20:00"
       timezone: "America/Toronto"
     ignore:
       - dependency-name: "*"
@@ -24,6 +24,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "monday"
       time: "16:00"
       timezone: "America/Toronto"
