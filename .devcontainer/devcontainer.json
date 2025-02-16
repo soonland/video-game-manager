@@ -22,7 +22,7 @@
 		5000,
 		5173
 	],
-	"postStartCommand": "npm ci"
+	// "postStartCommand": "npm ci"
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
 	// Configure tool-specific properties.
