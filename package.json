@@ -9,5 +9,9 @@
   ],
   "devDependencies": {
     "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "@mui/icons-material": "^7.0.1",
+    "@mui/material": "^7.0.1"
   }
 }
