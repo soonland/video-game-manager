@@ -2,7 +2,8 @@
   "name": "video-game-manager",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"npm run start --workspace=backend\" \"npm run dev --workspace=frontend\""
+    "start": "concurrently \"npm run start --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "cypress:open": "npm run cy:open --workspace=frontend"
   },
   "workspaces": [
     "packages/*"
