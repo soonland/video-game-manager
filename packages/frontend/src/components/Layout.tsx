@@ -41,6 +41,27 @@ const Layout = () => {
 
   const pageTitle = getPageTitle(location.pathname, t);
 
+  const sx = {
+    mx: 1,
+    mb: 0.5,
+    borderRadius: 1.5,
+    color: "rgba(255,255,255,0.6)",
+    borderLeft: "3px solid transparent",
+    borderColor: "transparent",
+    pl: "16px",
+    "&.Mui-selected": {
+      bgcolor: "rgba(35, 87, 137, 0.15)",
+      color: "#ffffff",
+      "&:hover": {
+        bgcolor: "rgba(35, 87, 137, 0.22)",
+      },
+    },
+    "&:hover": {
+      bgcolor: "rgba(255,255,255,0.06)",
+      color: "#ffffff",
+    },
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       {/* ── AppBar ───────────────────────────────────────────────────── */}
@@ -131,11 +152,7 @@ const Layout = () => {
             selected={location.pathname.startsWith("/games")}
             data-testid="nav.games"
             sx={{
-              mx: 1,
-              mb: 0.5,
-              borderRadius: 1.5,
-              color: "rgba(255,255,255,0.6)",
-              // Left accent bar for active state
+              ...sx,
               borderLeft: location.pathname.startsWith("/games")
                 ? "3px solid"
                 : "3px solid transparent",
@@ -143,17 +160,6 @@ const Layout = () => {
                 ? "primary.main"
                 : "transparent",
               pl: location.pathname.startsWith("/games") ? "13px" : "16px",
-              "&.Mui-selected": {
-                bgcolor: "rgba(35, 87, 137, 0.15)",
-                color: "#ffffff",
-                "&:hover": {
-                  bgcolor: "rgba(35, 87, 137, 0.22)",
-                },
-              },
-              "&:hover": {
-                bgcolor: "rgba(255,255,255,0.06)",
-                color: "#ffffff",
-              },
             }}
           >
             <ListItemIcon
@@ -180,10 +186,7 @@ const Layout = () => {
             selected={location.pathname.startsWith("/platforms")}
             data-testid="nav.platforms"
             sx={{
-              mx: 1,
-              mb: 0.5,
-              borderRadius: 1.5,
-              color: "rgba(255,255,255,0.6)",
+              ...sx,
               borderLeft: location.pathname.startsWith("/platforms")
                 ? "3px solid"
                 : "3px solid transparent",
@@ -191,17 +194,6 @@ const Layout = () => {
                 ? "primary.main"
                 : "transparent",
               pl: location.pathname.startsWith("/platforms") ? "13px" : "16px",
-              "&.Mui-selected": {
-                bgcolor: "rgba(35, 87, 137, 0.15)",
-                color: "#ffffff",
-                "&:hover": {
-                  bgcolor: "rgba(35, 87, 137, 0.22)",
-                },
-              },
-              "&:hover": {
-                bgcolor: "rgba(255,255,255,0.06)",
-                color: "#ffffff",
-              },
             }}
           >
             <ListItemIcon

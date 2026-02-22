@@ -143,31 +143,36 @@ const GameForm = ({
     }
   }, [hasError]);
 
+  const resetState = () => {
+    setName("");
+    setYear("");
+    setPlatform("");
+    setGenre("");
+    setStatus("Not Started");
+    setRating(null);
+    setIsEditing(false);
+    setHasError(false);
+    setIsSuccess(false);
+    setErrors([]);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (name && year && platform && genre) {
       setIsProcessing(true);
+      const game = {
+        id: existingGame?.id ?? 0,
+        name,
+        year: Number(year),
+        platform: platform,
+        genre: genre,
+        status,
+        rating,
+      };
       if (isEditing && existingGame) {
-        await onUpdate({
-          id: existingGame.id,
-          name,
-          year: Number(year),
-          platform: platform as number,
-          genre: genre as Genre,
-          status,
-          rating,
-        })
+        await onUpdate(game)
           .then(() => {
-            setName("");
-            setYear("");
-            setPlatform("");
-            setGenre("");
-            setStatus("Not Started");
-            setRating(null);
-            setIsEditing(false);
-            setHasError(false);
-            setIsSuccess(true);
-            setErrors([]);
+            resetState();
           })
           .catch(() => {
             setHasError(true);
@@ -175,25 +180,9 @@ const GameForm = ({
             setErrors(["gameForm.errorEdit"]);
           });
       } else {
-        await onAdd({
-          name,
-          year: Number(year),
-          platform: platform as number,
-          genre: genre as Genre,
-          status,
-          rating,
-        })
+        await onAdd(game)
           .then(() => {
-            setName("");
-            setYear("");
-            setPlatform("");
-            setGenre("");
-            setStatus("Not Started");
-            setRating(null);
-            setIsEditing(false);
-            setHasError(false);
-            setIsSuccess(true);
-            setErrors([]);
+            resetState();
           })
           .catch(() => {
             setHasError(true);
@@ -220,16 +209,7 @@ const GameForm = ({
 
   const resetForm = () => {
     onReset();
-    setName("");
-    setYear("");
-    setPlatform("");
-    setGenre("");
-    setStatus("Not Started");
-    setRating(null);
-    setIsEditing(false);
-    setHasError(false);
-    setIsSuccess(false);
-    setErrors([]);
+    resetState();
   };
 
   return (
