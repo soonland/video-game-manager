@@ -55,17 +55,18 @@ npm run cy:run:local:headless --workspace=frontend
 
 ```
 packages/
-  backend/   – Fastify REST API + SQLite database
-  frontend/  – React 19 + Vite SPA
+  backend/   – Fastify REST API + SQLite database (TypeScript)
+  frontend/  – React 19 + Vite SPA (TypeScript)
+  types/     – Shared TypeScript interfaces used by both backend and frontend
 ```
 
 ### Backend (`packages/backend/`)
 
-Single-file server at `server.js`. Uses **Fastify** with **better-sqlite3** (synchronous SQLite). Two tables: `games` (id, name, year, platform FK, genre) and `platforms` (id, name, year). Listens on **port 5000**.
+Modular TypeScript server. Entry point is `src/server.ts`; database setup is in `src/db.ts`; routes are split into `src/routes/games.ts` and `src/routes/platforms.ts`. Uses **Fastify** with **better-sqlite3** (synchronous SQLite) and runs via `tsx`. Two tables: `games` (id, name, year, platform FK, genre, status, rating) and `platforms` (id, name, year). Listens on **port 5000**.
 
 REST API endpoints:
 - `GET/POST /api/games` — supports `?$expand=platform`, `?$filter=platform eq <id>`, `?$search=<term>`
-- `GET/PUT/DELETE /api/games/:id`
+- `GET/PUT/DELETE /api/games/:id` — supports `?$expand=platform`
 - `GET/POST /api/platforms`
 - `GET/PUT/DELETE /api/platforms/:id`
 
@@ -73,20 +74,18 @@ The SQLite database file (`games.db`) lives in `packages/backend/`.
 
 ### Frontend (`packages/frontend/`)
 
-**React 19** + **Vite** SPA. The Vite dev server proxies `/api` requests to `http://localhost:5000`.
+**React 19** + **Vite** SPA written in **TypeScript**. The Vite dev server proxies `/api` requests to `http://localhost:5000`.
 
 Key architecture points:
-- **No router** — single-page app with all state managed in `App.jsx`
-- **MUI v7** for all UI components; custom theme defined in `src/styles/theme.jsx`
+- **react-router-dom** for client-side routing; routes defined in `App.tsx`
+- **MUI v7** for all UI components; custom theme defined in `src/styles/theme.ts`
 - **i18next** for internationalization (EN/FR); translation files in `public/locales/{en,fr}/translation.json`; loaded at runtime via HTTP backend
-- **PropTypes** used for component prop validation (no TypeScript)
-- All API calls are direct `fetch()` calls inside component files (no centralized API service layer despite the `src/services/` directory existing)
+- **TypeScript** used throughout; shared types come from the `@vgm/types` workspace package
+- All API calls are direct `fetch()` calls inside page components
 
-Component structure in `src/components/`:
-- `GameForm.jsx` — add/edit game form with validation
-- `GameList.jsx`, `GameItem.jsx`, `GameDetail.jsx` — game display
-- `ListControl.jsx`, `ConfirmationDialog.jsx` — shared UI
-- `settings/Platforms.jsx` — platform CRUD dialog
+Component structure:
+- `src/components/`: `ConfirmationDialog.tsx`, `DataTable.tsx`, `GameForm.tsx`, `Layout.tsx`
+- `src/pages/`: `GamesPage.tsx`, `GameFormPage.tsx`, `PlatformsPage.tsx`, `PlatformFormPage.tsx`
 
 ### E2E Tests
 
