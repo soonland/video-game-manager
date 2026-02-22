@@ -39,12 +39,12 @@ Cypress.Commands.add("interceptApiCalls", () => {
     name: "Xbox One X",
     year: 2017,
   }).as("putPlatform");
-  cy.intercept("DELETE", "/api/platforms/7").as("deletePlatform");
+  cy.intercept("DELETE", "/api/platforms/4").as("deletePlatform");
 });
 
 Cypress.Commands.add("addPlatform", (name: string, year: number) => {
   cy.visit("/platforms/new");
-  cy.get("[data-testid='platform-name-form']")
+  cy.get("[data-testid='platform-name-form'] input")
     .should("exist")
     .and("be.visible")
     .type(name);
@@ -58,8 +58,8 @@ Cypress.Commands.add(
   "editPlatform",
   (id: number, name: string, year: number) => {
     cy.visit(`/platforms/${id}/edit`);
-    cy.get("[data-testid='platform-name-form']").clear();
-    cy.get("[data-testid='platform-name-form']").type(name);
+    cy.get("[data-testid='platform-name-form'] input").clear();
+    cy.get("[data-testid='platform-name-form'] input").type(name);
     cy.get("[data-testid='platform-year-form']").click();
     cy.get(`[data-value='${year}']`).click();
     cy.get("[data-testid='save-platform']").click();
@@ -69,6 +69,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("deletePlatform", (id: number) => {
   cy.get(`[data-testid='delete-platform-${id}']`).click();
+  cy.get("[data-testid='app.confirmationDialog.btnConfirm']").click();
   cy.wait("@deletePlatform");
   cy.get("[data-testid='app.snackbar']").should("be.visible");
 });

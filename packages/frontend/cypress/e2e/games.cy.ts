@@ -7,6 +7,8 @@ const mockGames: Game[] = [
     year: 2007,
     platform: { id: 1, name: "Xbox 360", year: 2005 },
     genre: "Action",
+    status: "Completed",
+    rating: 4,
   },
   {
     id: 2,
@@ -14,6 +16,8 @@ const mockGames: Game[] = [
     year: 2010,
     platform: { id: 1, name: "Xbox 360", year: 2005 },
     genre: "Action",
+    status: "Completed",
+    rating: 4,
   },
   {
     id: 3,
@@ -21,6 +25,8 @@ const mockGames: Game[] = [
     year: 2012,
     platform: { id: 1, name: "Xbox 360", year: 2005 },
     genre: "Action",
+    status: "Completed",
+    rating: 4,
   },
   {
     id: 4,
@@ -28,6 +34,8 @@ const mockGames: Game[] = [
     year: 2021,
     platform: { id: 3, name: "Xbox Series X|S", year: 2020 },
     genre: "Action",
+    status: "Completed",
+    rating: 4,
   },
   {
     id: 5,
@@ -35,6 +43,8 @@ const mockGames: Game[] = [
     year: 2017,
     platform: { id: 2, name: "Xbox One", year: 2013 },
     genre: "Action",
+    status: "Completed",
+    rating: 4,
   },
 ];
 

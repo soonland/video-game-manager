@@ -44,7 +44,7 @@ describe("Platforms Settings", () => {
     cy.visitPlatforms();
     cy.wait("@getGames");
     cy.wait("@getPlatforms");
-    cy.deletePlatform(7);
+    cy.deletePlatform(4);
   });
 
   it("should disable delete buttons if platform is associated with games", () => {
@@ -56,6 +56,8 @@ describe("Platforms Settings", () => {
           year: 2020,
           platform: { id: 1, name: "Xbox 360", year: 2005 },
           genre: "Action",
+          status: "Completed",
+          rating: 4,
         },
         {
           id: 2,
@@ -63,6 +65,8 @@ describe("Platforms Settings", () => {
           year: 2021,
           platform: { id: 2, name: "Xbox One", year: 2013 },
           genre: "Aventure",
+          status: "Completed",
+          rating: 4,
         },
       ],
       mockPlatforms,
