@@ -88,6 +88,10 @@ export interface GameResponse {
   game: Game;
 }
 
+export interface GameRawResponse {
+  game: GameRaw;
+}
+
 export interface PlatformsListResponse {
   platforms: Platform[];
 }

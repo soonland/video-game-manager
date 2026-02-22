@@ -7,6 +7,7 @@ import {
   GameRaw,
   GamesListQuery,
   GamesListResponse,
+  GameRawResponse,
   GameResponse,
   Platform,
   UpdateGameBody,
@@ -94,30 +95,59 @@ export async function gameRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get<{
     Params: { id: string };
-    Reply: GameResponse | ErrorResponse;
+    Querystring: GamesListQuery;
+    Reply: GameResponse | GameRawResponse | ErrorResponse;
   }>('/games/:id', async (request, reply) => {
     const { id } = request.params;
-    const sql = 'SELECT * FROM games WHERE id = ?';
+    const { $expand } = request.query;
     try {
-      const row = db.prepare(sql).get(id) as GameRaw | undefined;
-      if (row) {
-        const protocol = request.protocol;
-        const hostname = request.hostname;
-        const port = request.socket.localPort;
+      const protocol = request.protocol;
+      const hostname = request.hostname;
+      const port = request.socket.localPort;
 
-        const platformSql = 'SELECT * FROM platforms WHERE id = ?';
-        const platformRow = db.prepare(platformSql).get(row.platform) as
-          | Platform
-          | undefined;
-
-        const game: Game = {
-          ...row,
-          platform: platformRow ?? { id: row.platform, name: '', year: 0 },
-          href: `${protocol}://${hostname}:${port}/api/games/${row.id}`,
+      if ($expand === 'platform') {
+        const sql = `SELECT games.*, platforms.name as platform_name, platforms.year as platform_year, platforms.id as platform_id
+                     FROM games
+                     LEFT JOIN platforms ON games.platform = platforms.id
+                     WHERE games.id = ?`;
+        type RawRow = GameRaw & {
+          platform_id: number;
+          platform_name: string;
+          platform_year: number;
         };
-        reply.send({ game });
+        const row = db.prepare(sql).get(id) as RawRow | undefined;
+        if (row) {
+          const platformObj: Platform = {
+            id: row.platform_id ?? (row.platform as unknown as number),
+            name: row.platform_name ?? '',
+            year: row.platform_year ?? 0,
+          };
+          const game: Game = {
+            id: row.id,
+            name: row.name,
+            year: row.year,
+            genre: row.genre,
+            status: row.status,
+            rating: row.rating,
+            platform: platformObj,
+            href: `${protocol}://${hostname}:${port}/api/games/${row.id}`,
+          };
+          reply.send({ game });
+        } else {
+          reply.status(404).send({ error: 'Game not found' });
+        }
       } else {
-        reply.status(404).send({ error: 'Game not found' });
+        const sql = 'SELECT * FROM games WHERE id = ?';
+        const row = db.prepare(sql).get(id) as GameRaw | undefined;
+        if (row) {
+          const game: GameRaw = {
+            ...row,
+            href: `${protocol}://${hostname}:${port}/api/games/${row.id}`,
+          };
+          reply.send({ game });
+        } else {
+          reply.status(404).send({ error: 'Game not found' });
+        }
       }
     } catch (err) {
       reply.status(400).send({ error: (err as Error).message });
