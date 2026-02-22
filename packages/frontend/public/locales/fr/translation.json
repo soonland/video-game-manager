@@ -30,12 +30,19 @@
         "errorEdit": "Une erreur s'est produite lors de la modification de la plateforme",
         "added": "La plateforme a été ajoutée avec succès",
         "updated": "La plateforme a été mise à jour avec succès",
-        "deleted": "La plateforme a été supprimée avec succès"
+        "deleted": "La plateforme a été supprimée avec succès",
+        "noPlatforms": "Aucune plateforme trouvée"
       }
     },
     "filter": {
       "platform": "Plateforme",
-      "search": "Rechercher par nom de jeu"
+      "search": "Rechercher par nom de jeu",
+      "searchPlatform": "Rechercher par nom de plateforme",
+      "status": "Statut"
+    },
+    "nav": {
+      "games": "Jeux",
+      "platforms": "Plateformes"
     }
   },
   "gameList": {
@@ -43,10 +50,13 @@
     "platform": "Plateforme",
     "year": "Année de sortie",
     "genre": "Genre",
+    "status": "Statut",
+    "rating": "Note",
     "actions": "Actions",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "noGames": "Aucun jeu trouvé"
+    "noGames": "Aucun jeu trouvé",
+    "rowsPerPage": "Lignes par page :"
   },
   "gameForm": {
     "addGame": "Ajouter un jeu",
@@ -55,6 +65,8 @@
     "platform": "Plateforme",
     "year": "Année de sortie",
     "genre": "Genre",
+    "status": "Statut",
+    "rating": "Note",
     "errorName": "Veuillez entrer un nom",
     "errorPlatform": "Veuillez sélectionner une plateforme",
     "errorYear": "Veuillez entrer une année de sortie",
@@ -64,6 +76,12 @@
     "added": "Le jeu a été ajouté avec succès",
     "updated": "Le jeu a été mis à jour avec succès",
     "deleted": "Le jeu a été supprimé avec succès"
+  },
+  "status": {
+    "NotStarted": "Non commencé",
+    "Playing": "En cours",
+    "Completed": "Terminé",
+    "Dropped": "Abandonné"
   },
   "button": {
     "add": "Ajouter un jeu",

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "paths": {
+      "@vgm/types": ["../types/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

@@ -30,12 +30,19 @@
         "errorEdit": "An error occurred while editing the platform",
         "added": "The platform has been successfully added",
         "updated": "The platform has been successfully updated",
-        "deleted": "The platform has been successfully deleted"
+        "deleted": "The platform has been successfully deleted",
+        "noPlatforms": "No platforms found"
       }
     },
     "filter": {
       "platform": "Platform",
-      "search": "Search by game name"
+      "search": "Search by game name",
+      "searchPlatform": "Search by platform name",
+      "status": "Status"
+    },
+    "nav": {
+      "games": "Games",
+      "platforms": "Platforms"
     }
   },
   "gameList": {
@@ -43,10 +50,13 @@
     "platform": "Platform",
     "year": "Release year",
     "genre": "Genre",
+    "status": "Status",
+    "rating": "Rating",
     "actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
-    "noGames": "No games found"
+    "noGames": "No games found",
+    "rowsPerPage": "Rows per page:"
   },
   "gameForm": {
     "addGame": "Add game",
@@ -55,6 +65,8 @@
     "platform": "Platform",
     "year": "Release year",
     "genre": "Genre",
+    "status": "Status",
+    "rating": "Rating",
     "errorName": "Please enter a name",
     "errorPlatform": "Please select a platform",
     "errorYear": "Please enter a release year",
@@ -64,6 +76,12 @@
     "added": "The game has been successfully added",
     "updated": "The game has been successfully updated",
     "deleted": "The game has been successfully deleted"
+  },
+  "status": {
+    "NotStarted": "Not Started",
+    "Playing": "Playing",
+    "Completed": "Completed",
+    "Dropped": "Dropped"
   },
   "button": {
     "add": "Add game",

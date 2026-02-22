@@ -4,7 +4,7 @@ export default defineConfig({
   projectId: "hk8yzm",
   e2e: {
     baseUrl: "http://localhost:4173",
-    specPattern: "**/*.cy.js",
+    specPattern: "**/*.cy.{js,ts}",
     screenshotsFolder: "cypress/screenshots",
     screenshotOnRunFailure: true,
     videosFolder: "cypress/videos",
