@@ -1,20 +1,29 @@
 import { Close } from "@mui/icons-material";
 import {
+  Box,
+  Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   IconButton,
-  Button,
-  CircularProgress,
-  Box,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
+interface ConfirmationDialogProps {
+  open: boolean;
+  onClose: (event: object, reason: "backdropClick" | "escapeKeyDown") => void;
+  onConfirm: () => void;
+}
+
+const ConfirmationDialog = ({
+  open,
+  onClose,
+  onConfirm,
+}: ConfirmationDialogProps) => {
   const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -42,7 +51,7 @@ const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
           }}
         >
           {t("app.confirmDeletionTitle")}
-          <IconButton onClick={onClose}>
+          <IconButton onClick={() => onClose({}, "escapeKeyDown")}>
             <Close />
           </IconButton>
         </Box>
@@ -52,7 +61,7 @@ const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={onClose}
+          onClick={() => onClose({}, "escapeKeyDown")}
           data-testid="app.confirmationDialog.btnCancel"
           variant="contained"
           color="secondary"
@@ -75,12 +84,6 @@ const ConfirmationDialog = ({ open, onClose, onConfirm }) => {
       </DialogActions>
     </Dialog>
   );
-};
-
-ConfirmationDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
 };
 
 export default ConfirmationDialog;

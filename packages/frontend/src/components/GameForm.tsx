@@ -9,14 +9,15 @@ import {
   List,
   ListItem,
   MenuItem,
+  Rating,
   Select,
   Stack,
-  styled,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { Game, Genre, GENRES, Platform, STATUSES, Status } from "@vgm/types";
+import { FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const CustomAlert = styled(Alert)({
@@ -31,20 +32,58 @@ const CustomAlert = styled(Alert)({
   },
 });
 
-const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
+interface GameFormProps {
+  onAdd: (gameData: {
+    name: string;
+    year: number;
+    platform: number;
+    genre: Genre;
+    status: Status;
+    rating: number | null;
+  }) => Promise<void>;
+  onUpdate: (gameData: {
+    id: number;
+    name: string;
+    year: number;
+    platform: number;
+    genre: Genre;
+    status: Status;
+    rating: number | null;
+  }) => Promise<void>;
+  onReset: () => void;
+  existingGame?: Game | null;
+}
+
+const GameForm = ({
+  onAdd,
+  onUpdate,
+  existingGame,
+  onReset,
+}: GameFormProps) => {
   const { t } = useTranslation();
-  const [platforms, setPlatforms] = useState([]);
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [name, setName] = useState(existingGame ? existingGame.name : "");
-  const [year, setYear] = useState(existingGame ? existingGame.year : "");
-  const [platform, setPlatform] = useState(
-    existingGame ? existingGame.platform : "",
+  const [year, setYear] = useState<number | string>(
+    existingGame ? existingGame.year : "",
   );
-  const [genre, setGenre] = useState(existingGame ? existingGame.genre : "");
+  // Always store platform as ID (number), not as object
+  const [platform, setPlatform] = useState<number | "">(
+    existingGame?.platform?.id ?? "",
+  );
+  const [genre, setGenre] = useState<Genre | "">(
+    existingGame ? existingGame.genre : "",
+  );
+  const [status, setStatus] = useState<Status>(
+    existingGame?.status ?? "Not Started",
+  );
+  const [rating, setRating] = useState<number | null>(
+    existingGame?.rating ?? null,
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
   // Identifiants pour les labels
   const nameId = "game-name";
@@ -60,21 +99,25 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
         }
         return response.json();
       })
-      .then((data) => {
-        setPlatforms(data.platforms); // Supposons que setGames est utilisé pour stocker la liste des jeux
+      .then((data: { platforms: Platform[] }) => {
+        setPlatforms(data.platforms);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error("Error fetching platforms:", error);
       });
   };
 
   useEffect(() => {
     if (existingGame) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setName(existingGame.name);
       setYear(existingGame.year);
-      setPlatform(existingGame.platform);
+      setPlatform(existingGame.platform?.id ?? "");
       setGenre(existingGame.genre);
+      setStatus(existingGame.status ?? "Not Started");
+      setRating(existingGame.rating ?? null);
       setIsEditing(true);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [existingGame]);
 
@@ -100,23 +143,27 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
     }
   }, [hasError]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (name && year && platform && genre) {
       setIsProcessing(true);
-      if (isEditing) {
+      if (isEditing && existingGame) {
         await onUpdate({
           id: existingGame.id,
           name,
           year: Number(year),
-          platform,
-          genre,
+          platform: platform as number,
+          genre: genre as Genre,
+          status,
+          rating,
         })
           .then(() => {
             setName("");
             setYear("");
             setPlatform("");
             setGenre("");
+            setStatus("Not Started");
+            setRating(null);
             setIsEditing(false);
             setHasError(false);
             setIsSuccess(true);
@@ -128,12 +175,21 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
             setErrors(["gameForm.errorEdit"]);
           });
       } else {
-        await onAdd({ name, year: Number(year), platform, genre })
+        await onAdd({
+          name,
+          year: Number(year),
+          platform: platform as number,
+          genre: genre as Genre,
+          status,
+          rating,
+        })
           .then(() => {
             setName("");
             setYear("");
             setPlatform("");
             setGenre("");
+            setStatus("Not Started");
+            setRating(null);
             setIsEditing(false);
             setHasError(false);
             setIsSuccess(true);
@@ -149,12 +205,14 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
       setHasError(true);
       setIsSuccess(false);
       setErrors(
-        [
-          !name && "gameForm.errorName",
-          !year && "gameForm.errorYear",
-          !platform && "gameForm.errorPlatform",
-          !genre && "gameForm.errorGenre",
-        ].filter(Boolean),
+        (
+          [
+            !name && "gameForm.errorName",
+            !year && "gameForm.errorYear",
+            !platform && "gameForm.errorPlatform",
+            !genre && "gameForm.errorGenre",
+          ] as Array<string | false>
+        ).filter(Boolean) as string[],
       );
     }
     setIsProcessing(false);
@@ -166,6 +224,8 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
     setYear("");
     setPlatform("");
     setGenre("");
+    setStatus("Not Started");
+    setRating(null);
     setIsEditing(false);
     setHasError(false);
     setIsSuccess(false);
@@ -179,11 +239,6 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
         spacing={2}
         data-testid="app.gameForm.container"
       >
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography variant="h4" data-testid="app.gameForm.header">
-            {isEditing ? t("gameForm.editGame") : t("gameForm.addGame")}
-          </Typography>
-        </Box>
         <Collapse in={hasError}>
           <CustomAlert severity="error" data-testid="app.gameForm.alert.error">
             <List>
@@ -194,6 +249,7 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
             </List>
           </CustomAlert>
         </Collapse>
+
         <Stack direction="row" spacing={2} data-testid="app.gameForm.fields">
           <TextField
             id={nameId}
@@ -202,8 +258,8 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            fullWidth
             size="small"
-            variant="filled"
             error={errors.includes("gameForm.errorName")}
           />
           <TextField
@@ -213,76 +269,110 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             required
+            sx={{ width: 140, flexShrink: 0 }}
             size="small"
-            variant="filled"
             error={errors.includes("gameForm.errorYear")}
           />
         </Stack>
-        <Stack direction="row" spacing={2}>
-          <FormControl
-            fullWidth
-            margin="normal"
+
+        <FormControl
+          fullWidth
+          size="small"
+          required
+          error={errors.includes("gameForm.errorPlatform")}
+        >
+          <InputLabel id={`${platformId}-label`}>
+            {t("gameForm.platform")}
+          </InputLabel>
+          <Select
+            id={platformId}
+            data-testid="app.gameForm.platform"
+            labelId={`${platformId}-label`}
+            value={platform}
+            label={t("gameForm.platform")}
+            onChange={(e) => setPlatform(e.target.value as number)}
             size="small"
             required
-            error={errors.includes("gameForm.errorPlatform")}
           >
-            <InputLabel id={`${platformId}-label`}>
-              {t("gameForm.platform")}
-            </InputLabel>
-            <Select
-              id={platformId}
-              data-testid="app.gameForm.platform"
-              labelId={`${platformId}-label`}
-              value={platform}
-              label={t("gameForm.platform")}
-              onChange={(e) => setPlatform(e.target.value)}
-              size="small"
-              required
-              variant="filled"
-            >
-              {platforms.map((platform) => (
-                <MenuItem key={platform.id} value={platform.id}>
-                  {platform.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl
-            fullWidth
-            margin="normal"
+            {platforms.map((p) => (
+              <MenuItem key={p.id} value={p.id}>
+                {p.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl
+          fullWidth
+          size="small"
+          required
+          error={errors.includes("gameForm.errorGenre")}
+        >
+          <InputLabel id={`${genreId}-label`}>{t("gameForm.genre")}</InputLabel>
+          <Select
+            id={genreId}
+            data-testid="app.gameForm.genre"
+            labelId={`${genreId}-label`}
+            label={t("gameForm.genre")}
+            value={genre}
+            onChange={(e) => setGenre(e.target.value as Genre)}
             size="small"
             required
-            error={errors.includes("gameForm.errorGenre")}
           >
-            <InputLabel id={`${genreId}-label`}>
-              {t("gameForm.genre")}
-            </InputLabel>
-            <Select
-              id={genreId}
-              data-testid="app.gameForm.genre"
-              labelId={`${genreId}-label`}
-              label={t("gameForm.genre")}
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              size="small"
-              required
-              variant="filled"
-            >
-              <MenuItem value="Action">Action</MenuItem>
-              <MenuItem value="Aventure">Aventure</MenuItem>
-              <MenuItem value="RPG">RPG</MenuItem>
-              <MenuItem value="Simulation">Simulation</MenuItem>
-              <MenuItem value="Stratégie">Stratégie</MenuItem>
-              <MenuItem value="Sport">Sport</MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
+            {GENRES.map((g) => (
+              <MenuItem key={g} value={g}>
+                {g}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth size="small" required>
+          <InputLabel>{t("gameForm.status")}</InputLabel>
+          <Select
+            value={status}
+            label={t("gameForm.status")}
+            onChange={(e) => setStatus(e.target.value as Status)}
+            data-testid="app.gameForm.status"
+          >
+            {STATUSES.map((s) => (
+              <MenuItem key={s} value={s}>
+                {t(`status.${s.replace(" ", "")}`)}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Box>
+          <Typography variant="caption" color="text.secondary">
+            {t("gameForm.rating")}
+          </Typography>
+          <Rating
+            value={rating}
+            onChange={(_e, val) => setRating(val)}
+            size="small"
+            data-testid="app.gameForm.rating"
+          />
+        </Box>
+
+        {/* flex-end + gap keeps buttons close together and right-aligned,
+            instead of space-evenly which pushed them to opposite edges */}
         <Stack
           direction="row"
           spacing={2}
-          justifyContent={"space-evenly"}
+          justifyContent="flex-end"
           data-test="app.gameForm.buttons"
         >
+          <Button
+            type="reset"
+            data-testid="app.gameForm.btn.reset"
+            variant="outlined"
+            disabled={isProcessing}
+            color="inherit"
+            onClick={resetForm}
+          >
+            {t("button.cancel")}
+          </Button>
           {isEditing ? (
             <Button
               type="submit"
@@ -324,34 +414,10 @@ const GameForm = ({ onAdd, onUpdate, existingGame, onReset }) => {
               {t("button.add")}
             </Button>
           )}
-          <Button
-            type="reset"
-            data-testid="app.gameForm.btn.reset"
-            variant="contained"
-            disabled={isProcessing}
-            color="secondary"
-            onClick={resetForm}
-          >
-            {t("button.reset")}
-          </Button>
         </Stack>
       </Stack>
     </form>
   );
-};
-
-// PropTypes pour GameForm
-GameForm.propTypes = {
-  onAdd: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  onReset: PropTypes.func.isRequired,
-  existingGame: PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string,
-    year: PropTypes.number,
-    platform: PropTypes.string,
-    genre: PropTypes.string,
-  }),
 };
 
 export default GameForm;

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "CommonJS",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "types": ["cypress", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@vgm/types": ["../../types/index.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

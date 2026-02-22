@@ -1,4 +1,6 @@
-const mockGames = [
+import { Game, Platform } from "@vgm/types";
+
+const mockGames: Game[] = [
   {
     id: 1,
     name: "Mass Effect",
@@ -36,13 +38,13 @@ const mockGames = [
   },
 ];
 
-const mockPlatforms = [
+const mockPlatforms: Platform[] = [
   { id: 1, name: "Xbox 360", year: 2005 },
   { id: 2, name: "Xbox One", year: 2013 },
   { id: 3, name: "Xbox Series X|S", year: 2020 },
 ];
 
-const interceptGamesAndPlatforms = () => {
+const interceptGamesAndPlatforms = (): void => {
   cy.intercept("GET", "/api/games?$expand=platform", {
     body: { games: mockGames },
   }).as("getGames");
@@ -53,14 +55,16 @@ const interceptGamesAndPlatforms = () => {
 
 describe("Games panel", () => {
   it("should add a new game", () => {
-    cy.visit("/");
     interceptGamesAndPlatforms();
     cy.intercept("POST", "/api/games", {
       statusCode: 200,
       body: { message: "Game added successfully!", id: 6 },
     }).as("postGame");
+    cy.intercept("GET", "/api/games?$expand=platform", {
+      body: { games: mockGames },
+    }).as("getGamesAfterAdd");
 
-    cy.wait("@getGames");
+    cy.visit("/games/new");
 
     cy.get("[data-testid='app.gameForm.name']").type("Mass Effect");
     cy.get("[data-testid='app.gameForm.year']").type("2007");
@@ -71,40 +75,30 @@ describe("Games panel", () => {
     cy.get("[data-testid='app.gameForm.btn.add']").click();
 
     cy.wait("@postGame");
-    cy.get("[data-testid='app.snackbar']").should("exist").and("be.visible");
   });
 
   it("should delete a game", () => {
-    cy.visit("/");
     interceptGamesAndPlatforms();
     cy.intercept("DELETE", /\/api\/games\/\d+$/).as("deleteGame");
 
+    cy.visit("/games");
     cy.wait("@getGames");
 
-    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
-    cy.get("[data-testid='app.gameList.item.checkbox.1']").click();
-    cy.get("[data-testid='app.listControl.btn.delete']").click();
+    cy.get("[data-testid='app.deleteGame.1']").click();
     cy.get("[data-testid='app.confirmationDialog.btnConfirm']").click();
 
     cy.wait("@deleteGame").then((interception) => {
       expect(interception.request.url).to.match(/\/api\/games\/1$/);
     });
-    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
   });
 
-  it("should check all games", () => {
-    cy.visit("/");
+  it("should navigate to add game form when clicking Add button", () => {
     interceptGamesAndPlatforms();
 
+    cy.visit("/games");
     cy.wait("@getGames");
 
-    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
-    cy.get("[data-testid='app.listControl.btn.delete']").contains("(0)");
-    cy.get("[data-testid='app.listControl.btn.checkAll']").click();
-    cy.get("[data-testid='app.listControl.btn.delete']").should("be.enabled");
-    cy.get("[data-testid='app.listControl.btn.delete']").contains("(5)");
-    cy.get("[data-testid='app.listControl.btn.checkAll']").click();
-    cy.get("[data-testid='app.listControl.btn.delete']").should("be.disabled");
-    cy.get("[data-testid='app.listControl.btn.delete']").contains("(0)");
+    cy.get("[data-testid='app.addGameButton']").should("be.visible").click();
+    cy.url().should("include", "/games/new");
   });
 });
