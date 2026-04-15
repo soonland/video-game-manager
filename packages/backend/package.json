@@ -16,7 +16,7 @@
     "@fastify/cors": "^11.2.0",
     "@vgm/types": "*",
     "better-sqlite3": "^12.6.2",
-    "fastify": "^5.8.3"
+    "fastify": "^5.8.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
