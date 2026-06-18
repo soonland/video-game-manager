@@ -20,7 +20,7 @@
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^7.3.8",
     "@vgm/types": "*",
-    "i18next": "^26.1.0",
+    "i18next": "^26.3.1",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-http-backend": "^3.0.5",
     "react": "^19.2.4",
