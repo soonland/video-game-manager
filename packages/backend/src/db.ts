@@ -2,7 +2,7 @@ import path from 'path';
 
 import Database from 'better-sqlite3';
 
-const db = new Database(path.join(__dirname, '..', 'games.db'));
+const db = new Database(process.env.DB_PATH ?? path.join(__dirname, '..', 'games.db'));
 
 db.exec(`CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
