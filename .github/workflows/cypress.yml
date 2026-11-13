@@ -20,16 +20,28 @@ jobs:
       - name: Clean npm cache
         run: npm cache clean --force
         
-      - name: Install backend dependencies
-        run: npm install
-  
-      - name: Starting backend
-        run: node packages/backend/server.js &
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start backend
+        run: |
+          npm run start --workspace=backend &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:5000/api/platforms >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend did not start within 30 seconds" >&2
+          exit 1
+        env:
+          DB_PATH: ${{ runner.temp }}/vgm-e2e.db
 
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v7
         with:
+          install: false # Already installed above
           build: npm run build --workspace=frontend
           # Starts web server for E2E tests - replace with your own server invocation
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server

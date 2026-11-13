@@ -1,5 +1,3 @@
-import { Game, Platform } from "@vgm/types";
-
 const validateButtons = (
   type: string,
   disabledIds: number[],
@@ -13,70 +11,58 @@ const validateButtons = (
   });
 };
 
-const interceptGamesAndPlatforms = (games: Game[], platforms: Platform[]) => {
-  cy.intercept("GET", "/api/games?$expand=platform", { games }).as("getGames");
-  cy.intercept("GET", "/api/platforms", { platforms }).as("getPlatforms");
-};
-
-const mockPlatforms: Platform[] = [
-  { id: 1, name: "Xbox 360", year: 2005 },
-  { id: 2, name: "Xbox One", year: 2013 },
-  { id: 3, name: "PlayStation 4", year: 2013 },
-  { id: 4, name: "PlayStation 5", year: 2020 },
-];
-
 describe("Platforms Settings", () => {
   beforeEach(() => {
+    cy.resetDatabase();
     cy.interceptApiCalls();
     cy.visitPlatforms();
-    cy.wait("@getGames");
-    cy.wait("@getPlatforms");
+    cy.wait("@getGames").its("response.statusCode").should("eq", 200);
+    cy.wait("@getPlatforms").its("response.statusCode").should("eq", 200);
   });
 
-  it("should check the Platforms Settings Panel", () => {
-    // Ajouter une nouvelle plateforme
+  it("should add, edit, and delete platforms", () => {
     cy.addPlatform("Nintendo Switch", 2017);
 
-    // Modifier la plateforme 2
-    cy.editPlatform(2, "Xbox One X", 2017);
+    cy.getPlatformId("Xbox One").then((platformId) => {
+      cy.editPlatform(platformId, "Xbox One X", 2017);
+    });
 
-    // Supprimer la nouvelle plateforme ajoutée
-    cy.visitPlatforms();
-    cy.wait("@getGames");
-    cy.wait("@getPlatforms");
-    cy.deletePlatform(4);
+    cy.getPlatformId("Nintendo Switch").then((platformId) => {
+      cy.visitPlatforms();
+      cy.wait("@getGames").its("response.statusCode").should("eq", 200);
+      cy.wait("@getPlatforms").its("response.statusCode").should("eq", 200);
+      cy.deletePlatform(platformId);
+    });
+
+    cy.request("GET", "http://localhost:5000/api/platforms").then(
+      ({ body }) => {
+        assert.isFalse(
+          body.platforms.some(
+            (platform: { name: string }) => platform.name === "Nintendo Switch",
+          ),
+        );
+        assert.isTrue(
+          body.platforms.some(
+            (platform: { name: string }) => platform.name === "Xbox One X",
+          ),
+        );
+      },
+    );
   });
 
-  it("should disable delete buttons if platform is associated with games", () => {
-    interceptGamesAndPlatforms(
-      [
-        {
-          id: 1,
-          name: "Game 1",
-          year: 2020,
-          platform: { id: 1, name: "Xbox 360", year: 2005 },
-          genre: "Action",
-          status: "Completed",
-          rating: 4,
-        },
-        {
-          id: 2,
-          name: "Game 2",
-          year: 2021,
-          platform: { id: 2, name: "Xbox One", year: 2013 },
-          genre: "Aventure",
-          status: "Completed",
-          rating: 4,
-        },
-      ],
-      mockPlatforms,
-    );
-
-    cy.visitPlatforms();
-    cy.wait("@getGames");
-    cy.wait("@getPlatforms");
-
-    // Vérifier les boutons de suppression
-    validateButtons("delete", [1, 2], [3, 4]);
+  it("should disable delete buttons for platforms associated with games", () => {
+    cy.getPlatformId("Xbox 360").then((xbox360Id) => {
+      cy.getPlatformId("Xbox One").then((xboxOneId) => {
+        cy.getPlatformId("PlayStation 4").then((playStation4Id) => {
+          cy.getPlatformId("PlayStation 5").then((playStation5Id) => {
+            validateButtons(
+              "delete",
+              [xbox360Id, xboxOneId],
+              [playStation4Id, playStation5Id],
+            );
+          });
+        });
+      });
+    });
   });
 });
