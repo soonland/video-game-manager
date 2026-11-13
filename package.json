@@ -11,5 +11,10 @@
   "devDependencies": {
     "concurrently": "^10.0.6",
     "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "cypress": true,
+    "esbuild": true
   }
 }
